@@ -31,6 +31,7 @@ Shopeeで出品する新たな商品候補を発掘し、**Googleスプレッド
 - `references/sp-api-pointer.md` — SP-API / Shopee API の位置づけ（リンク集）
 - `references/spike-amazon-jp.md` — Amazon.co.jp 突合の短い検証（スパイク）
 - `references/jina-reader.md` — Jina Reader（r.jina.ai）の呼び方・Secrets・注意
+- `references/product-pipeline-concise.md` — **新着→見張り→Amazon初出品→Slack（揃ったときだけ）** の全体像（簡潔版）
 
 ## 入力（あなたが用意するもの）
 

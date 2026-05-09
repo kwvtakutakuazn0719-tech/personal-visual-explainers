@@ -57,6 +57,19 @@ const HEADERS = {
     "checked_at",
     "checked_by",
   ],
+  /** 新着〜Amazon初出品までの「一覧・通知ゲート」（product-pipeline-concise.md） */
+  product_queue: [
+    "seq",
+    "brand",
+    "product_name",
+    "release_date",
+    "product_image_url",
+    "asin",
+    "dedupe_key",
+    "amazon_listed_at",
+    "slack_notified_at",
+    "notes",
+  ],
 };
 
 function needHeaders(currentFirstRow, expected) {

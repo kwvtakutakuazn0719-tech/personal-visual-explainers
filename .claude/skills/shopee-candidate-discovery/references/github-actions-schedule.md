@@ -31,6 +31,7 @@ title: GitHub Actions schedule (pointers)
 | `AMAZON_ASSOCIATES_PARTNER_TAG` | （任意）アソシエイトのストアID（日本向け例: `mysite-22`）。PA-API では必須。 |
 | `SLACK_WEBHOOK_URL` | （任意）[Slack Incoming Webhook](https://api.slack.com/messaging/webhooks) の URL。朝レポートを投稿。 |
 | `JINA_API_KEY` | （任意）[Jina Reader](https://r.jina.ai/docs) の Bearer トークン。無くても Reader は呼べるが、レートが厳しい場合に設定。詳細は `references/jina-reader.md`。 |
+| `SPIKE_NOVABLAST_ASIN` | （任意）試験ワークフロー `shopee-candidate-spike-novablast` 用。省略時はスクリプト既定の ASIN。 |
 
 **共有**: そのサービスアカウントのメールアドレスに、スプレッドシートを **編集者** で共有する。
 

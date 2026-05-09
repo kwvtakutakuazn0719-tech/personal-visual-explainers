@@ -1,0 +1,36 @@
+# 手動のみ: NOVABLAST 試験（product_queue シード → 揃った行だけ Slack）
+name: shopee-candidate-spike-novablast
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  spike:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Bootstrap (product_queue タブ作成)
+        env:
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: npm run shopee-sheet:bootstrap
+      - name: Seed NOVABLAST 5 SUNNY SIZZLE row
+        env:
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SPIKE_NOVABLAST_ASIN: ${{ secrets.SPIKE_NOVABLAST_ASIN }}
+          AMAZON_PA_API_ACCESS_KEY: ${{ secrets.AMAZON_PA_API_ACCESS_KEY }}
+          AMAZON_PA_API_SECRET_KEY: ${{ secrets.AMAZON_PA_API_SECRET_KEY }}
+          AMAZON_ASSOCIATES_PARTNER_TAG: ${{ secrets.AMAZON_ASSOCIATES_PARTNER_TAG }}
+        run: npm run shopee-candidate:seed-novablast-spike
+      - name: Notify if row complete
+        env:
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: npm run shopee-candidate:notify-product-ready

@@ -5,7 +5,7 @@ Google スプレッドシートはこちらからあなたのアカウント上�
 ## 手順（約1分）
 
 1. [Google スプレッドシート](https://sheets.google.com) で **新規**を作成する。
-2. 下の名前で **シート（タブ）** を用意する: `scope` / `ledger` /（任意）`asin_attempts`
+2. 下の名前で **シート（タブ）** を用意する: `scope` / `ledger` / `product_queue` /（任意）`asin_attempts`
 3. 各タブを開き、**ファイル → インポート → アップロード** で対応する CSV を選ぶ。
    - **インポート場所**: 「現在のシートを置き換える」（そのタブを選んだ状態で実行）
 4. `scope` の `example.com` の行は削除して、実際の URL に差し替える。
@@ -17,8 +17,9 @@ Google スプレッドシートはこちらからあなたのアカウント上�
 | `scope.csv` | `scope` |
 | `ledger.csv` | `ledger` |
 | `asin_attempts.csv` | `asin_attempts`（任意） |
+| `product_queue.csv` | `product_queue`（新着〜初出品までの一覧・Slack通知ゲート） |
 
-列の意味は `.claude/skills/shopee-candidate-discovery/references/ledger-schema.md` を正本とする。
+列の意味は `ledger` が `.claude/skills/shopee-candidate-discovery/references/ledger-schema.md`、**ゴール全体の整理**は `references/product-pipeline-concise.md`。
 
 ---
 
