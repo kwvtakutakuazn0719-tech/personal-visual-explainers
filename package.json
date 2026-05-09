@@ -8,7 +8,8 @@
     "shopee-candidate:daily-digest": "node scripts/shopee-candidate-daily-digest.mjs",
     "shopee-candidate:seed-novablast-spike": "node scripts/shopee-candidate-seed-novablast-spike.mjs",
     "shopee-candidate:notify-product-ready": "node scripts/shopee-candidate-notify-product-ready.mjs",
-    "shopee-candidate:spike-novablast": "node scripts/shopee-candidate-seed-novablast-spike.mjs && node scripts/shopee-candidate-notify-product-ready.mjs"
+    "shopee-candidate:spike-novablast": "node scripts/shopee-candidate-seed-novablast-spike.mjs && node scripts/shopee-candidate-notify-product-ready.mjs",
+    "shopee-candidate:post-mock-report-slack": "node scripts/shopee-post-mock-report-slack.mjs"
   },
   "dependencies": {
     "googleapis": "^144.0.0",
