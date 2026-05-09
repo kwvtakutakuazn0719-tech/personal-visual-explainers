@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=800">
+  <title>PYRENEES — Product Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sp: {
+              bg: '#FFFFFF', surface: '#F9FAFB', card: '#F3F4F6',
+              border: '#E5E7EB', text: '#111827', muted: '#6B7280',
+              dim: '#9CA3AF', dark: '#1F2937', positive: '#059669',
+              warning: '#D97706', blue: '#1D4ED8',
+              'blue-light': '#EFF6FF', 'blue-mid': '#DBEAFE',
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-sp-bg text-sp-text antialiased" style="width:800px; margin:0; padding:0;">
+<div style="width:800px;">
+<div class="border-t-4 border-sp-dark">
+<div class="px-8 pt-7 pb-8">
+
+<div class="flex items-start justify-between mb-4">
+  <div>
+    <div class="flex items-center gap-2 mb-2">
+      <span class="bg-sp-dark text-white text-xs font-bold tracking-widest px-3 py-1 rounded-sm uppercase">KEEN</span>
+      <span class="text-sp-muted text-xs font-medium uppercase tracking-wide">Women&rsquo;s Leather Hiking Boot</span>
+    </div>
+    <h1 class="text-3xl font-black text-sp-text leading-none tracking-tight">PYRENEES</h1>
+    <p class="text-sp-muted text-xs mt-1.5">Classic European leather profile meets Targhee-inspired traction &mdash; KEEN.DRY inside.</p>
+  </div>
+  <div class="flex flex-col items-end gap-1.5 flex-shrink-0 ml-4">
+    <span class="text-xs font-bold px-3 py-1 rounded-full bg-pink-500 text-white">Women&rsquo;s</span>
+    <div class="w-11 h-11 bg-sp-surface border border-sp-border rounded-xl flex items-center justify-center">
+      <i data-lucide="mountain" class="w-5 h-5 text-sp-dark"></i>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-wrap gap-1.5 mb-5">
+  <span class="inline-flex items-center gap-1 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-2.5 py-1 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3 h-3 text-sp-positive"></i>Day Hikes &amp; Trails</span>
+  <span class="inline-flex items-center gap-1 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-2.5 py-1 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3 h-3 text-sp-positive"></i>Wet Weather Walks</span>
+  <span class="inline-flex items-center gap-1 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-2.5 py-1 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3 h-3 text-sp-positive"></i>Travel &amp; Town</span>
+  <span class="inline-flex items-center gap-1 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-2.5 py-1 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3 h-3 text-sp-positive"></i>All-Day Comfort</span>
+</div>
+
+<div class="border-t border-sp-border mb-5"></div>
+
+<div class="mb-5">
+  <div class="bg-sp-surface border border-sp-border rounded-xl overflow-hidden flex flex-col items-center justify-end pb-2 mx-auto" style="max-width:320px; height:200px;">
+    <img src="./variation-01.png" alt="PYRENEES Syrup" class="object-contain w-full flex-1 p-2" style="max-height:160px;" onerror="this.style.display='none';">
+    <span class="text-xs font-semibold text-sp-muted">Syrup Leather</span>
+  </div>
+</div>
+
+<div class="flex gap-5 mb-6">
+  <div class="flex-shrink-0 w-60 bg-sp-surface border border-sp-border rounded-xl overflow-hidden flex items-center justify-center" style="min-height:220px;">
+    <img src="./variation-01.png" alt="KEEN Pyrenees side profile"
+      class="w-full h-full object-contain p-2" style="max-height:260px;"
+      onerror="this.style.display='none'; this.parentElement.innerHTML='<p class=\'text-xs text-sp-dim p-4 text-center\'>Image not available</p>';">
+  </div>
+  <div class="flex-1 flex flex-col gap-3">
+    <div class="space-y-2">
+      <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+        <i data-lucide="droplets" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+        <div>
+          <p class="text-xs font-bold text-amber-800">KEEN.DRY Waterproof</p>
+          <p class="text-xs text-amber-700">Breathable membrane helps keep feet dry when trails turn damp or slushy.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3 bg-sp-blue-light border border-sp-blue-mid rounded-xl px-4 py-3">
+        <i data-lucide="shield" class="w-4 h-4 text-sp-blue flex-shrink-0 mt-0.5"></i>
+        <div>
+          <p class="text-xs font-bold text-blue-800">Bump Toe &amp; Leather Build</p>
+          <p class="text-xs text-blue-700">All-leather upper with KEEN&rsquo;s protective toe wrap and heritage outdoor look.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+        <i data-lucide="footprints" class="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5"></i>
+        <div>
+          <p class="text-xs font-bold text-green-800">Targhee-Style Traction</p>
+          <p class="text-xs text-green-700">High-traction sole concept borrowed from the Targhee family for confident grip off pavement.</p>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-2">
+      <div class="bg-sp-dark rounded-xl py-3 text-center">
+        <p class="text-xl font-black text-white leading-none">13<span class="text-sm text-gray-400">cm</span></p>
+        <p class="text-xs text-gray-400 mt-1">Shaft height</p>
+      </div>
+      <div class="bg-sp-dark rounded-xl py-3 text-center">
+        <p class="text-xl font-black text-white leading-none">Mid</p>
+        <p class="text-xs text-gray-400 mt-1">Cut height</p>
+      </div>
+      <div class="bg-sp-dark rounded-xl py-3 text-center">
+        <p class="text-xl font-black text-white leading-none">Dry</p>
+        <p class="text-xs text-gray-400 mt-1">KEEN.DRY</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-3 gap-3 mb-5">
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-bold text-sp-muted uppercase tracking-wider mb-1.5">Upper</p>
+    <p class="text-xs font-semibold text-sp-text mb-0.5">Waterproof leather</p>
+    <p class="text-xs text-sp-muted">Classic paneling with padded tongue and collar; speed hooks for quick lace tension.</p>
+  </div>
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-bold text-sp-muted uppercase tracking-wider mb-1.5">Lining / membrane</p>
+    <p class="text-xs font-semibold text-sp-text mb-0.5">KEEN.DRY</p>
+    <p class="text-xs text-sp-muted">Brand waterproof-breathable system to manage moisture inside the boot.</p>
+  </div>
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-bold text-sp-muted uppercase tracking-wider mb-1.5">Outsole</p>
+    <p class="text-xs font-semibold text-sp-text mb-0.5">Rubber lug outsole</p>
+    <p class="text-xs text-sp-muted">Aggressive tread pattern for mixed dirt, gravel, and light trail surfaces.</p>
+  </div>
+</div>
+
+<div class="bg-sp-surface border border-sp-border rounded-xl overflow-hidden mb-5">
+  <div class="px-4 py-2.5 border-b border-sp-border flex items-center gap-2">
+    <i data-lucide="ruler" class="w-4 h-4 text-sp-muted"></i>
+    <span class="text-xs font-bold text-sp-text">Size &amp; fit note</span>
+    <span class="text-xs text-sp-muted ml-1">— KEEN lists fine 0.5 cm steps; many hikers size up ~1 cm vs sneakers for socks &amp; descent room (see community reviews).</span>
+  </div>
+  <p class="text-xs text-sp-muted px-4 py-3 bg-white">Always match your foot length to the official size chart on the listing.</p>
+</div>
+
+<p class="text-xs font-bold text-sp-muted uppercase tracking-widest mb-2">Shoppers highlight</p>
+<div class="grid grid-cols-2 gap-3 mb-6">
+  <div class="bg-white border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-semibold text-sp-text mb-1">Roomy forefoot, still secure</p>
+    <p class="text-xs text-sp-muted">Owners often praise a comfortable width with good lace-down hold around the ankle.</p>
+  </div>
+  <div class="bg-white border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-semibold text-sp-text mb-1">Light on the foot for leather</p>
+    <p class="text-xs text-sp-muted">Frequently noted: reassuring sole thickness without a clunky, heavy feel on long walks.</p>
+  </div>
+</div>
+
+<div class="flex items-center justify-between">
+  <div class="flex items-center gap-1.5 text-xs text-sp-muted">
+    <i data-lucide="package" class="w-3.5 h-3.5"></i>
+    Genuine Product · Ships from Japan
+  </div>
+  <div class="text-xs text-sp-dim">keenfootwear.com</div>
+</div>
+
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!-- このファイルの<head>はすべてのモデルファイルと同一に保つ。変更時はモデルファイルも更新する -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=800">
+  <title><!-- TITLE --></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sp: {
+              bg:       '#FFFFFF',
+              surface:  '#F9FAFB',
+              card:     '#F3F4F6',
+              border:   '#E5E7EB',
+              text:     '#111827',
+              muted:    '#6B7280',
+              dim:      '#9CA3AF',
+              dark:     '#1F2937',
+              positive: '#059669',
+              warning:  '#D97706',
+              negative: '#DC2626',
+              blue:     '#1D4ED8',
+              'blue-light': '#EFF6FF',
+              'blue-mid':   '#DBEAFE',
+              orange:       '#EA580C',
+              'orange-light': '#FFF7ED',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-sp-bg text-sp-text antialiased" style="width:800px; margin:0; padding:0;">
+  <div style="width:800px;">
+    <div class="border-t-4 border-sp-dark">
+      <div class="px-10 py-8">
+
+<!-- CONTENT_START -->
+
+<!-- CONTENT_END -->
+
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

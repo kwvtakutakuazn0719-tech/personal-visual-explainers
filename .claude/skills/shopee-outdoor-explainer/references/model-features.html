@@ -1,0 +1,167 @@
+<!-- MODEL: features card — brand hero + key selling points (5 features)
+     Product: Salomon ULTRA GLIDE 4 (trail running shoe)
+     Purpose: Surface layer — beginner reads this and thinks "this is exactly what I wanted" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=800">
+  <title>Salomon ULTRA GLIDE 4 — Key Features</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sp: {
+              bg:       '#FFFFFF',
+              surface:  '#F9FAFB',
+              card:     '#F3F4F6',
+              border:   '#E5E7EB',
+              text:     '#111827',
+              muted:    '#6B7280',
+              dim:      '#9CA3AF',
+              dark:     '#1F2937',
+              positive: '#059669',
+              warning:  '#D97706',
+              negative: '#DC2626',
+              blue:     '#1D4ED8',
+              'blue-light': '#EFF6FF',
+              'blue-mid':   '#DBEAFE',
+              orange:       '#EA580C',
+              'orange-light': '#FFF7ED',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-sp-bg text-sp-text antialiased" style="width:800px; margin:0; padding:0;">
+  <div style="width:800px;">
+    <div class="border-t-4 border-sp-dark">
+      <div class="px-10 py-8">
+
+<!-- ===== HERO HEADER ===== -->
+<div class="flex items-start justify-between mb-6">
+  <div>
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-sp-dark text-white text-xs font-bold tracking-widest px-3 py-1 rounded-sm uppercase">Salomon</span>
+      <span class="text-sp-dim text-xs">·</span>
+      <span class="text-sp-muted text-xs font-medium uppercase tracking-wide">Trail Running Shoes</span>
+    </div>
+    <h1 class="text-4xl font-black text-sp-text leading-none mb-2 tracking-tight">ULTRA GLIDE 4</h1>
+    <p class="text-sp-muted text-sm leading-relaxed">Long-distance trail comfort — lighter, cooler, and more adaptive than ever.</p>
+  </div>
+  <div class="text-right flex-shrink-0 ml-6">
+    <div class="w-16 h-16 bg-sp-surface border border-sp-border rounded-2xl flex items-center justify-center">
+      <i data-lucide="footprints" class="w-8 h-8 text-sp-dark"></i>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BEST FOR TAGS ===== -->
+<div class="flex flex-wrap gap-2 mb-8">
+  <span class="inline-flex items-center gap-1.5 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-3 py-1.5 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sp-positive"></i>
+    Long Trail Runs
+  </span>
+  <span class="inline-flex items-center gap-1.5 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-3 py-1.5 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sp-positive"></i>
+    Road-to-Trail Mixed Terrain
+  </span>
+  <span class="inline-flex items-center gap-1.5 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-3 py-1.5 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sp-positive"></i>
+    High-Mileage Training
+  </span>
+  <span class="inline-flex items-center gap-1.5 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-3 py-1.5 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sp-positive"></i>
+    Warm &amp; Humid Conditions
+  </span>
+</div>
+
+<div class="border-t border-sp-border mb-7"></div>
+
+<!-- ===== FEATURE CARDS (3-col grid) ===== -->
+<p class="text-xs font-bold text-sp-muted uppercase tracking-widest mb-4">Key Features</p>
+<div class="grid grid-cols-3 gap-4 mb-4">
+
+  <!-- Feature 1: Cushioned Ride -->
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-4">
+    <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
+      <i data-lucide="layers" class="w-5 h-5 text-sp-blue"></i>
+    </div>
+    <p class="text-sm font-bold text-sp-text mb-1">Max Cushion Ride</p>
+    <p class="text-xs text-sp-muted leading-relaxed">41mm heel stack with optiFOAM absorbs impact across long distances without feeling unstable.</p>
+  </div>
+
+  <!-- Feature 2: Breathable Upper -->
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-4">
+    <div class="w-9 h-9 bg-sky-100 rounded-xl flex items-center justify-center mb-3">
+      <i data-lucide="wind" class="w-5 h-5 text-sky-600"></i>
+    </div>
+    <p class="text-sm font-bold text-sp-text mb-1">Breathable &amp; Lightweight</p>
+    <p class="text-xs text-sp-muted leading-relaxed">Redesigned engineered mesh runs 10% lighter than v3 — keeps feet cool even in hot conditions.</p>
+  </div>
+
+  <!-- Feature 3: Trail Grip -->
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-4">
+    <div class="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center mb-3">
+      <i data-lucide="mountain" class="w-5 h-5 text-green-700"></i>
+    </div>
+    <p class="text-sm font-bold text-sp-text mb-1">All-Terrain Grip</p>
+    <p class="text-xs text-sp-muted leading-relaxed">Contagrip® outsole with 4mm lugs and ReliefSPHERE geometry handles dirt, roots, and wet rock.</p>
+  </div>
+
+</div>
+
+<div class="grid grid-cols-3 gap-4">
+
+  <!-- Feature 4: Adaptive Fit -->
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-4">
+    <div class="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center mb-3">
+      <i data-lucide="hand" class="w-5 h-5 text-violet-600"></i>
+    </div>
+    <p class="text-sm font-bold text-sp-text mb-1">Adaptive Fit</p>
+    <p class="text-xs text-sp-muted leading-relaxed">SensiFIT + endoFit internal sleeve wraps the foot for a sock-like hold without pressure points.</p>
+  </div>
+
+  <!-- Feature 5: Quick Lacing -->
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-4">
+    <div class="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center mb-3">
+      <i data-lucide="zap" class="w-5 h-5 text-amber-600"></i>
+    </div>
+    <p class="text-sm font-bold text-sp-text mb-1">quickLACE System</p>
+    <p class="text-xs text-sp-muted leading-relaxed">One-pull lacing for fast, precise tightening mid-run. No loose ends, no re-tying.</p>
+  </div>
+
+  <!-- Highlight box: What's new -->
+  <div class="bg-sp-dark rounded-xl p-4 text-white">
+    <p class="text-xs font-bold uppercase tracking-widest mb-2 text-gray-400">What's New in v4</p>
+    <p class="text-xs leading-relaxed text-gray-200">Fully re-engineered upper — no TPU overlays. Softer, lighter, and more abrasion-resistant than the previous generation.</p>
+  </div>
+
+</div>
+
+<!-- ===== FOOTER STRIP ===== -->
+<div class="mt-8 pt-5 border-t border-sp-border flex items-center justify-between">
+  <div class="flex items-center gap-1.5 text-xs text-sp-muted">
+    <i data-lucide="package" class="w-3.5 h-3.5"></i>
+    Genuine Product · Ships from Japan
+  </div>
+  <div class="text-xs text-sp-dim">salomon.com / ultra-glide-4</div>
+</div>
+
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

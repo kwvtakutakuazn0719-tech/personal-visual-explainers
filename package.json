@@ -1,0 +1,11 @@
+{
+  "name": "personal-visual-explainers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "shopee-sheet:bootstrap": "node scripts/shopee-candidate-sheet-bootstrap.mjs"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}

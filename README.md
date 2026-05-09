@@ -10,7 +10,9 @@
 personal-visual-explainers/
 ├── .claude/skills/
 │   ├── creating-skills/                  ← スキルの作り方ガイド
-│   └── creating-visual-explainers/       ← 図解を生成するスキル（配布済みの図解ツールと同じもの）
+│   ├── creating-visual-explainers/       ← 図解を生成するスキル（配布済みの図解ツールと同じもの）
+│   ├── shopee-explainer-common/          ← Shopee図解の共通ルール（Layer ①）
+│   └── shopee-outdoor-explainer/         ← Shopeeアウトドア向け図解（Layer ②・トリガー「アウトドア図解」）
 ├── sample/
 │   └── majiai-diagram/                   ← 作成例（本気AIの図解スキル）
 │       ├── .claude/skills/diagram-maji/  ← スキル本体
@@ -24,6 +26,8 @@ personal-visual-explainers/
 |---------|------|
 | `.claude/skills/creating-skills/` | スキルの作り方ガイド。設計原則・パターン集・チェックリストが入っています |
 | `.claude/skills/creating-visual-explainers/` | 図解HTMLを生成するスキル。配布済みの図解ツールと同じものです |
+| `.claude/skills/shopee-explainer-common/` | Shopee用の寸法・禁止事項・テンプレ（`base.html` / `main-image.html`）の正本 |
+| `.claude/skills/shopee-outdoor-explainer/` | アウトドア系Shopee商品図解。チャットで **「アウトドア図解」** で起動 |
 | `sample/majiai-diagram/` | 図解の作成例。本気AIが実際に使っている図解スキルの構造がわかります |
 | `output/` | 生成した図解の保存先 |
 

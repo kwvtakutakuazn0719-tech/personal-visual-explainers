@@ -1,0 +1,33 @@
+# Shopee 出品候補の「毎日 06:00 JST」キック用の雛形。
+# JST = UTC+9 のため、JST 06:00 は前日 UTC 21:00 に相当する。
+# 毎日 JST 06:00: スプシのタブとヘッダを冪等で維持（npm run shopee-sheet:bootstrap）。
+# 候補の発掘・ASIN突合の本処理は別ジョブで拡張する（Cursor Cloud / 自前スクリプト等）。
+
+name: shopee-candidate-discovery-daily
+
+on:
+  schedule:
+    - cron: "0 21 * * *" # 毎日 UTC 21:00 = 翌日 JST 06:00
+  workflow_dispatch: {}
+
+jobs:
+  kick:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Bootstrap spreadsheet (tabs + headers)
+        env:
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: npm run shopee-sheet:bootstrap

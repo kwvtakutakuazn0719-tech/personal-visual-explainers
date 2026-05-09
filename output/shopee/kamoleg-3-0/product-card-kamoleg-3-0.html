@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=800">
+  <title>KAMOLEG 3.0 — Product Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sp: {
+              bg: '#FFFFFF', surface: '#F9FAFB', card: '#F3F4F6',
+              border: '#E5E7EB', text: '#111827', muted: '#6B7280',
+              dim: '#9CA3AF', dark: '#1F2937', positive: '#059669',
+              warning: '#D97706', blue: '#1D4ED8',
+              'blue-light': '#EFF6FF', 'blue-mid': '#DBEAFE',
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-sp-bg text-sp-text antialiased" style="width:800px; margin:0; padding:0;">
+<div style="width:800px;">
+<div class="border-t-4 border-sp-dark">
+<div class="px-8 pt-7 pb-8">
+
+<!-- 1. HERO -->
+<div class="flex items-start justify-between mb-4">
+  <div>
+    <div class="flex items-center gap-2 mb-2">
+      <span class="bg-sp-dark text-white text-xs font-bold tracking-widest px-3 py-1 rounded-sm uppercase">&amp; MEDICAL</span>
+      <span class="text-sp-muted text-xs font-medium uppercase tracking-wide">Fitness Walking Shoe</span>
+    </div>
+    <h1 class="text-3xl font-black text-sp-text leading-none tracking-tight">KAMOLEG 3.0</h1>
+    <p class="text-sp-muted text-xs mt-1.5">Turn daily steps into light training — rocker sole, ~3.5&deg; incline, indoor-to-outdoor versatility.</p>
+  </div>
+  <div class="flex flex-col items-end gap-1.5 flex-shrink-0 ml-4">
+    <span class="text-xs font-bold px-3 py-1 rounded-full bg-gray-500 text-white">Unisex</span>
+    <div class="w-11 h-11 bg-sp-surface border border-sp-border rounded-xl flex items-center justify-center">
+      <i data-lucide="activity" class="w-5 h-5 text-sp-dark"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Best-for pills -->
+<div class="flex flex-wrap gap-1.5 mb-5">
+  <span class="inline-flex items-center gap-1 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-2.5 py-1 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3 h-3 text-sp-positive"></i>Daily Walking &amp; Commutes</span>
+  <span class="inline-flex items-center gap-1 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-2.5 py-1 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3 h-3 text-sp-positive"></i>Home &amp; Office</span>
+  <span class="inline-flex items-center gap-1 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-2.5 py-1 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3 h-3 text-sp-positive"></i>Neighborhood Errands</span>
+  <span class="inline-flex items-center gap-1 bg-sp-surface border border-sp-border text-sp-text text-xs font-semibold px-2.5 py-1 rounded-full">
+    <i data-lucide="check-circle-2" class="w-3 h-3 text-sp-positive"></i>Light Fitness Walking</span>
+</div>
+
+<div class="border-t border-sp-border mb-5"></div>
+
+<!-- 2. VARIATION IMAGES (4) -->
+<div class="grid gap-2 mb-5" style="grid-template-columns: repeat(4, 1fr);">
+  <div class="bg-sp-surface border border-sp-border rounded-xl overflow-hidden flex flex-col items-center justify-end pb-2" style="height:155px;">
+    <img src="./variation-01.png" alt="KAMOLEG 3.0 lineup" class="object-contain w-full flex-1 p-1.5" style="max-height:122px;" onerror="this.style.display='none';">
+    <span class="text-xs font-semibold text-sp-muted">Lineup</span>
+  </div>
+  <div class="bg-sp-surface border border-sp-border rounded-xl overflow-hidden flex flex-col items-center justify-end pb-2" style="height:155px;">
+    <img src="./variation-02.png" alt="Pure Black" class="object-contain w-full flex-1 p-1.5" style="max-height:122px;" onerror="this.style.display='none';">
+    <span class="text-xs font-semibold text-sp-muted">Pure Black</span>
+  </div>
+  <div class="bg-sp-surface border border-sp-border rounded-xl overflow-hidden flex flex-col items-center justify-end pb-2" style="height:155px;">
+    <img src="./variation-03.png" alt="Off-White" class="object-contain w-full flex-1 p-1.5" style="max-height:122px;" onerror="this.style.display='none';">
+    <span class="text-xs font-semibold text-sp-muted">Off-White</span>
+  </div>
+  <div class="bg-sp-surface border border-sp-border rounded-xl overflow-hidden flex flex-col items-center justify-end pb-2" style="height:155px;">
+    <img src="./variation-04.png" alt="Stone Gray and Black" class="object-contain w-full flex-1 p-1.5" style="max-height:122px;" onerror="this.style.display='none';">
+    <span class="text-xs font-semibold text-sp-muted">Stone Gray / Black</span>
+  </div>
+</div>
+
+<!-- 3. KEY TECH + SPECS (Pattern A) -->
+<div class="flex gap-5 mb-6">
+  <div class="flex-shrink-0 w-60 bg-sp-surface border border-sp-border rounded-xl overflow-hidden flex items-center justify-center" style="min-height:220px;">
+    <img src="./variation-01.png" alt="KAMOLEG 3.0 three colorways"
+      class="w-full h-full object-contain p-2" style="max-height:260px;"
+      onerror="this.style.display='none'; this.parentElement.innerHTML='<p class=\'text-xs text-sp-dim p-4 text-center\'>Image not available</p>';">
+  </div>
+  <div class="flex-1 flex flex-col gap-3">
+    <div class="space-y-2">
+      <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+        <i data-lucide="trending-up" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+        <div>
+          <p class="text-xs font-bold text-amber-800">~3.5&deg; Forefoot Incline</p>
+          <p class="text-xs text-amber-700">Toe-side lift creates a gentle uphill sensation on flat ground so the same walk recruits calves and glutes more like slope training.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3 bg-sp-blue-light border border-sp-blue-mid rounded-xl px-4 py-3">
+        <i data-lucide="orbit" class="w-4 h-4 text-sp-blue flex-shrink-0 mt-0.5"></i>
+        <div>
+          <p class="text-xs font-bold text-blue-800">Rounded Rocker Geometry</p>
+          <p class="text-xs text-blue-700">Continuous curved bottom supports a smooth heel-to-toe roll while subtle instability encourages light core engagement when you stand or stride.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+        <i data-lucide="sparkles" class="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5"></i>
+        <div>
+          <p class="text-xs font-bold text-green-800">Washable, Fresh-Feeling Insole</p>
+          <p class="text-xs text-green-700">Removable cushioned insole is hand-washable with antibacterial and deodorizing treatment to keep everyday wear cleaner and more comfortable.</p>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-2">
+      <div class="bg-sp-dark rounded-xl py-3 text-center">
+        <p class="text-xl font-black text-white leading-none">3.5<span class="text-sm text-gray-400">&deg;</span></p>
+        <p class="text-xs text-gray-400 mt-1">Forefoot incline</p>
+      </div>
+      <div class="bg-sp-dark rounded-xl py-3 text-center">
+        <p class="text-xl font-black text-white leading-none">223<span class="text-sm text-gray-400">g</span></p>
+        <p class="text-xs text-gray-400 mt-1">Per shoe (size M)</p>
+      </div>
+      <div class="bg-sp-dark rounded-xl py-3 text-center">
+        <p class="text-xl font-black text-white leading-none">~6<span class="text-sm text-gray-400">%</span></p>
+        <p class="text-xs text-gray-400 mt-1">Grade feel (brand claim)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. MATERIAL / COMPONENT SUMMARY -->
+<div class="grid grid-cols-3 gap-3 mb-5">
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-bold text-sp-muted uppercase tracking-wider mb-1.5">Upper</p>
+    <p class="text-xs font-semibold text-sp-text mb-0.5">Water-repellent polyester</p>
+    <p class="text-xs text-sp-muted">Soft padded shell with clean mule entry for quick on-and-off around town or indoors.</p>
+  </div>
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-bold text-sp-muted uppercase tracking-wider mb-1.5">Insole</p>
+    <p class="text-xs font-semibold text-sp-text mb-0.5">Removable cushioned footbed</p>
+    <p class="text-xs text-sp-muted">Hand-washable with antibacterial and odor-resistant treatment for fresher daily wear.</p>
+  </div>
+  <div class="bg-sp-surface border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-bold text-sp-muted uppercase tracking-wider mb-1.5">Platform sole</p>
+    <p class="text-xs font-semibold text-sp-text mb-0.5">Sculpted rocker platform</p>
+    <p class="text-xs text-sp-muted">Thick curved profile blends cushioning with the incline concept for fitness-oriented walking.</p>
+  </div>
+</div>
+
+<!-- 5. SIZE GUIDE -->
+<div class="bg-sp-surface border border-sp-border rounded-xl overflow-hidden mb-5">
+  <div class="px-4 py-2.5 border-b border-sp-border flex items-center gap-2">
+    <i data-lucide="ruler" class="w-4 h-4 text-sp-muted"></i>
+    <span class="text-xs font-bold text-sp-text">Size Guide</span>
+    <span class="text-xs text-sp-muted ml-1">— Listing covers JP ~22.0&ndash;27.5 cm (men &amp; women). True to size for most; if you are between sizes or have a high instep, consider sizing up (brand guidance).</span>
+  </div>
+  <div class="grid grid-cols-4 bg-sp-dark px-4 py-2">
+    <div class="text-xs font-bold text-gray-400 text-center">JP (cm)</div>
+    <div class="text-xs font-bold text-gray-400 text-center">US (ref.)</div>
+    <div class="text-xs font-bold text-gray-400 text-center">UK (ref.)</div>
+    <div class="text-xs font-bold text-gray-400 text-center">EUR (ref.)</div>
+  </div>
+  <div class="grid grid-cols-4 px-4 py-2 border-b border-sp-border text-center text-xs">
+    <div class="font-semibold">24.0</div>
+    <div class="text-sp-muted">6</div>
+    <div class="text-sp-muted">5</div>
+    <div class="text-sp-muted">39</div>
+  </div>
+  <div class="grid grid-cols-4 px-4 py-2 border-b border-sp-border text-center text-xs">
+    <div class="font-semibold">25.0</div>
+    <div class="text-sp-muted">7</div>
+    <div class="text-sp-muted">6</div>
+    <div class="text-sp-muted">40</div>
+  </div>
+  <div class="grid grid-cols-4 px-4 py-2 border-b border-sp-border text-center text-xs">
+    <div class="font-semibold">26.0</div>
+    <div class="text-sp-muted">8</div>
+    <div class="text-sp-muted">7</div>
+    <div class="text-sp-muted">41</div>
+  </div>
+  <div class="grid grid-cols-4 px-4 py-2 text-center text-xs">
+    <div class="font-semibold">27.0</div>
+    <div class="text-sp-muted">9</div>
+    <div class="text-sp-muted">8</div>
+    <div class="text-sp-muted">42.5</div>
+  </div>
+  <p class="text-xs text-sp-dim px-4 py-2 bg-white border-t border-sp-border">Reference conversions only — always match your foot length to the seller&rsquo;s official chart.</p>
+</div>
+
+<!-- 6. SHOPPER HIGHLIGHTS -->
+<p class="text-xs font-bold text-sp-muted uppercase tracking-widest mb-2">Shoppers highlight</p>
+<div class="grid grid-cols-2 gap-3 mb-6">
+  <div class="bg-white border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-semibold text-sp-text mb-1">Everyday training without the &ldquo;gym shoe&rdquo; look</p>
+    <p class="text-xs text-sp-muted">Owners describe a noticeable calf and glute burn on flat sidewalks, with a design that still blends with casual outfits.</p>
+  </div>
+  <div class="bg-white border border-sp-border rounded-xl p-3">
+    <p class="text-xs font-semibold text-sp-text mb-1">Easy on, fresher feel</p>
+    <p class="text-xs text-sp-muted">Pull-on convenience plus a removable, hand-washable insole is often praised for busy routines and warmer seasons.</p>
+  </div>
+</div>
+
+<!-- 7. FOOTER -->
+<div class="flex items-center justify-between">
+  <div class="flex items-center gap-1.5 text-xs text-sp-muted">
+    <i data-lucide="package" class="w-3.5 h-3.5"></i>
+    Genuine Product · Ships from Japan
+  </div>
+  <div class="text-xs text-sp-dim">amazon.co.jp product listing</div>
+</div>
+
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
