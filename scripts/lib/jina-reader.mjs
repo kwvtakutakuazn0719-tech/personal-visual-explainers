@@ -78,6 +78,54 @@ export function parseReaderResponse(raw) {
  * @param {string} brand
  * @param {{ title: string; body: string }} parsed
  */
+/** Jina がブロックページ・エラー HTML を返したとみなすヒューリスティック */
+export function isLikelyFetchFailure(raw, parsed) {
+  const meta = String(parsed?.metaBlock ?? "");
+  const body = String(parsed?.body ?? "");
+  const title = String(parsed?.title ?? "").toLowerCase();
+  const blob = `${meta}\n${body}`.slice(0, 12_000).toLowerCase();
+
+  const needles = [
+    "403",
+    "404",
+    "forbidden",
+    "access denied",
+    "ご迷惑をおかけ",
+    "アクセスが集中",
+    "お探しのページ",
+    "ページが見つかりません",
+    "something went wrong",
+    "error has occurred",
+    "robot check",
+    "captcha",
+    "enable javascript",
+  ];
+  if (needles.some((n) => blob.includes(n) || title.includes(n))) return true;
+  if (/^403\b|^404\b|forbidden/i.test(String(parsed?.title ?? "").trim())) return true;
+  return false;
+}
+
+/**
+ * 一覧ページの汎用タイトルだけでは PA 検索語に使わない（誤爆抑制）。
+ * @param {string} title
+ */
+export function isGenericStoreTitle(title) {
+  const t = String(title ?? "").trim().toLowerCase();
+  if (!t || t.length < 4) return true;
+  const generic = [
+    "all products",
+    "running shoes",
+    "new releases",
+    "403 forbidden",
+    "from scope (link)",
+    "from scope",
+  ];
+  if (generic.some((g) => t === g || t.startsWith(g + " "))) return true;
+  if (/bestselling|future releases|new releases in|新着一覧|すべての商品|公式.?オンラインショップ$/i.test(t))
+    return true;
+  return false;
+}
+
 export function guessAmazonKeywordsFromReader(brand, parsed) {
   const parts = [];
   const b = String(brand ?? "").trim();
@@ -86,4 +134,17 @@ export function guessAmazonKeywordsFromReader(brand, parsed) {
   if (t && (!b || t.toLowerCase() !== b.toLowerCase())) parts.push(t);
   const q = parts.join(" ").replace(/\s+/g, " ").trim();
   return q.slice(0, 400);
+}
+
+/**
+ * PA-API 用。エラーっぽい Reader 結果や汎用タイトルでは空文字を返す。
+ * @param {string} brand
+ * @param {string} raw Reader 生レスポンス
+ * @param {{ title: string; body: string; metaBlock: string }} parsed
+ */
+export function safeGuessAmazonKeywords(brand, raw, parsed) {
+  if (!parsed) return "";
+  if (isLikelyFetchFailure(raw, parsed)) return "";
+  if (isGenericStoreTitle(parsed.title)) return "";
+  return guessAmazonKeywordsFromReader(brand, parsed);
 }

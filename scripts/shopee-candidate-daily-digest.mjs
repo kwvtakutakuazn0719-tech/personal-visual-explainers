@@ -49,20 +49,24 @@ function appendSummary(line) {
   if (path) fs.appendFileSync(path, `${line}\n`, "utf8");
 }
 
-/**
- * @param {string} md
- */
-async function postSlackMarkdown(md) {
+/** Slack 用: 403・エラーっぽい行を下げる */
+function rowLooksLikeNoise(row) {
+  const name = String(row.candidate_name ?? "");
+  const note = String(row.amazon_match_note ?? "");
+  return (
+    /403|forbidden|ご迷惑|ページが見つかりません|not found|from scope \(link\)|^from\.\.\./i.test(
+      name,
+    ) ||
+    /403|forbidden|ご迷惑|jina reader 失敗|ブロック疑い/i.test(note)
+  );
+}
+
+/** @param {Record<string, unknown>[]} blocks Slack Block Kit の blocks */
+async function postSlackBlocks(blocks, fallbackText) {
   if (!SLACK_WEBHOOK_URL) return;
-  const text = md.length > 2800 ? `${md.slice(0, 2790)}…(truncated)` : md;
   const body = {
-    text: "Shopee 候補デイリーダイジェスト（JST）",
-    blocks: [
-      {
-        type: "section",
-        text: { type: "mrkdwn", text },
-      },
-    ],
+    text: fallbackText.slice(0, 500),
+    blocks,
   };
   const r = await fetch(SLACK_WEBHOOK_URL, {
     method: "POST",
@@ -131,7 +135,18 @@ async function main() {
     md += "_本日の `discovered_at` に該当する行はありません。_\n";
     console.log("digest: no rows for JST date", todayJst);
     appendSummary(md);
-    await postSlackMarkdown(md);
+    await postSlackBlocks(
+      [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*Shopee 出品候補ダイジェスト*（JST ${todayJst}）\n本日の \`discovered_at\` に該当する ledger 行はありません。`,
+          },
+        },
+      ],
+      `Shopee 候補 ${todayJst} 本日分なし`,
+    );
     return;
   }
 
@@ -142,8 +157,33 @@ async function main() {
   const cardMap = await getItemsCardFields(asins);
 
   md += "#### カード（ASIN あり）\n\n";
-  let slackMd = `*Shopee 出品候補ダイジェスト*（JST ${todayJst}）\n_ASIN あり ${withAsin.length}件 / なし ${noAsin.length}件_\n\n`;
+  const slackBlocks = [];
 
+  slackBlocks.push({
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*Shopee 出品候補ダイジェスト*（JST ${todayJst}）\n_ASIN あり ${withAsin.length}件 / なし ${noAsin.length}件_`,
+    },
+  });
+
+  if (withAsin.length === 0 && noAsin.length > 0) {
+    const pa = isPaapiConfigured() ? "PA-API の Secrets は入っています。" : "*PA-API の Secrets が未設定*の可能性が高いです（未設定だと ASIN は取れません）。";
+    const tip =
+      `*いまの内容が薄いときのチェック*\n` +
+      `• ${pa}\n` +
+      `• \`scope\` の URL は *店トップ*より *記事・新作一覧・検索結果1ページ* の方が Jina / 検索が効きます。\n` +
+      `• 列 \`amazon_keywords\` に *「ブランド + 型番 + 品目」* を手で入れると精度が一番上がります。\n` +
+      `• 詳細は GitHub の同じランの *Job Summary*（全文）を見てください。`;
+    slackBlocks.push({ type: "section", text: { type: "mrkdwn", text: tip } });
+    md += "#### 今日は ASIN ゼロのときのヒント\n\n";
+    md += `${pa}\n\n`;
+    md += "- `scope` の URL は **記事・一覧の1ページ** に寄せる\n";
+    md += "- **`amazon_keywords`** に型番＋品目を書く\n";
+    md += "- **Amazon の `/dp/ASIN` 直リンク**を `source_url` に置く\n\n";
+  }
+
+  let slackAsinLines = "";
   for (const row of withAsin) {
     const asin = row.current_asin;
     const card = cardMap.get(asin);
@@ -158,28 +198,58 @@ async function main() {
     if (row.amazon_match_note) md += `- メモ: ${row.amazon_match_note}\n`;
     md += "\n";
 
-    slackMd += `• *${title.slice(0, 120)}*\n  ASIN \`${asin}\` · <${link}|Amazon>`;
-    if (row.source_url) slackMd += ` · <${row.source_url}|根拠>`;
-    slackMd += "\n";
+    slackAsinLines += `• *${title.slice(0, 120)}*\n  ASIN \`${asin}\` · <${link}|Amazon>`;
+    if (row.source_url) slackAsinLines += ` · <${row.source_url}|根拠>`;
+    slackAsinLines += "\n";
+  }
+  if (slackAsinLines) {
+    slackBlocks.push({
+      type: "section",
+      text: { type: "mrkdwn", text: `*ASIN あり*\n${slackAsinLines.trimEnd()}` },
+    });
   }
 
   if (noAsin.length > 0) {
     md += "#### ASIN 未取得（`scope.amazon_keywords` または Amazon 直リンクを追加）\n\n";
-    slackMd += `\n*ASIN 未取得*\n`;
     for (const row of noAsin) {
       md += `- **${row.candidate_name || row.candidate_id}**`;
       if (row.source_url) md += ` — [根拠](${row.source_url})`;
       if (row.amazon_match_note) md += ` — _${row.amazon_match_note}_`;
       md += "\n";
-      slackMd += `• ${row.candidate_name || row.candidate_id}`;
-      if (row.source_url) slackMd += ` <${row.source_url}|根拠>`;
-      slackMd += "\n";
     }
     md += "\n";
+
+    const sorted = [...noAsin].sort((a, b) => {
+      const na = rowLooksLikeNoise(a) ? 1 : 0;
+      const nb = rowLooksLikeNoise(b) ? 1 : 0;
+      return na - nb;
+    });
+    const slackMax = 6;
+    const head = sorted.filter((r) => !rowLooksLikeNoise(r)).slice(0, slackMax);
+    const tail = sorted.filter((r) => rowLooksLikeNoise(r));
+    const shown = head.length > 0 ? head : sorted.slice(0, slackMax);
+    let slackNo = "*ASIN 未取得（抜粋）*\n";
+    for (const row of shown) {
+      const label = String(row.candidate_name || row.candidate_id).slice(0, 100);
+      slackNo += `• ${label}`;
+      if (row.source_url) slackNo += ` <${row.source_url}|根拠>`;
+      slackNo += "\n";
+    }
+    const hidden = noAsin.length - shown.length;
+    const noiseCount = tail.length;
+    if (hidden > 0) {
+      slackNo += `\n_他 ${hidden} 件は省略（403/一覧/ノイズは下位）。全体は Job Summary かスプシ \`ledger\` を参照。_`;
+    } else if (noiseCount > 0 && head.length > 0) {
+      slackNo += `\n_403/エラーっぽい行は ${noiseCount} 件あり（ledger で確認）。_`;
+    }
+    slackBlocks.push({
+      type: "section",
+      text: { type: "mrkdwn", text: slackNo.slice(0, 2900) },
+    });
   }
 
   appendSummary(md);
-  await postSlackMarkdown(slackMd);
+  await postSlackBlocks(slackBlocks, `Shopee 候補 ${todayJst} ASINあり${withAsin.length}`);
 
   console.log(
     `digest: JST ${todayJst} — ${todays.length} row(s), ASINあり ${withAsin.length}, なし ${noAsin.length}`,

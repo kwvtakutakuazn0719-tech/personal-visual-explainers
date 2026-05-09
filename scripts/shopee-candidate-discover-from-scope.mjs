@@ -16,8 +16,10 @@ import { isPaapiConfigured, searchItemsFirstHit } from "./lib/amazon-paapi-jp.mj
 import { formatJstYmd } from "./lib/jst-date.mjs";
 import {
   fetchReaderMarkdown,
-  guessAmazonKeywordsFromReader,
+  isGenericStoreTitle,
+  isLikelyFetchFailure,
   parseReaderResponse,
+  safeGuessAmazonKeywords,
 } from "./lib/jina-reader.mjs";
 
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
@@ -149,7 +151,9 @@ async function main() {
     let signal_type = "";
 
     let readerParsed = null;
+    let readerRaw = "";
     let readerExcerpt = "";
+    let jinaQualityNote = "";
     const useJina =
       !jinaReaderDisabled() &&
       jinaCalls < jinaCap &&
@@ -158,10 +162,17 @@ async function main() {
 
     if (useJina) {
       try {
-        const raw = await fetchReaderMarkdown(source_url);
+        readerRaw = await fetchReaderMarkdown(source_url);
         jinaCalls += 1;
-        readerParsed = parseReaderResponse(raw);
-        readerExcerpt = excerptForNote(readerParsed.body || raw, 720);
+        readerParsed = parseReaderResponse(readerRaw);
+        readerExcerpt = excerptForNote(readerParsed.body || readerRaw, 720);
+        if (isLikelyFetchFailure(readerRaw, readerParsed)) {
+          jinaQualityNote =
+            "Jina: 403/エラー/ブロック疑いの本文のため、PA 用の自動検索語は使っていません（記事URL・`/dp/ASIN`・`amazon_keywords` を推奨）。";
+        } else if (isGenericStoreTitle(readerParsed.title)) {
+          jinaQualityNote =
+            "Jina: 店舗・一覧っぽい汎用タイトルのため、PA 用の自動検索語は使っていません（`amazon_keywords` に型番＋品目を）。";
+        }
         if (jinaCalls < jinaCap) {
           await new Promise((res) => setTimeout(res, jinaDelayMs));
         }
@@ -173,7 +184,7 @@ async function main() {
 
     const guessedKw =
       readerParsed && !amazon_keywords
-        ? guessAmazonKeywordsFromReader(brand, readerParsed)
+        ? safeGuessAmazonKeywords(brand, readerRaw, readerParsed)
         : "";
     const effectiveKeywords = (amazon_keywords || guessedKw).trim();
 
@@ -288,6 +299,10 @@ async function main() {
     ]
       .filter(Boolean)
       .join(" | ");
+
+    if (jinaQualityNote) {
+      amazon_match_note = [jinaQualityNote, amazon_match_note].filter(Boolean).join("\n");
+    }
 
     newRows.push([
       newCandidateId(),

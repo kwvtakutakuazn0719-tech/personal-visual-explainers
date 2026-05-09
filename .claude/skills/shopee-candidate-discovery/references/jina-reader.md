@@ -31,6 +31,12 @@ title: Jina Reader（r.jina.ai）運用メモ
 - コミュニティ向けに **無料で使える**経路がある（公式の説明・提供形態は変わりうるため、常に [jina.ai](https://jina.ai/) / `r.jina.ai` の最新情報を確認する）。
 - **連続大量リクエストは避ける**: Actions では **1 ランあたりの Reader 呼び出し上限**（既定 **10**）と、**呼び出し間隔（約 1.8 秒）**を入れている。環境変数 `JINA_READER_MAX_PER_RUN` で上げられるが、**40 を上限**にクランプしている。
 
+## 実装側の補足（ノイズ対策）
+
+- `scripts/lib/jina-reader.mjs` の **`isLikelyFetchFailure`** … 403 / Forbidden / 「ご迷惑をおかけ」などを含む本文は **PA 用の自動検索語に使わない**。
+- **`isGenericStoreTitle`** … `All Products` や英語の一覧系タイトルだけのときも **自動検索語を出さない**（`amazon_keywords` 手入力を促す）。
+- `discover-from-scope` が `ledger.amazon_match_note` に **理由の一文**を足すことがある。
+
 ## 本リポジトリの環境変数
 
 | 変数 | 必須 | 説明 |
