@@ -29,7 +29,10 @@ title: GitHub Actions schedule (pointers)
 
 **共有**: そのサービスアカウントのメールアドレスに、スプレッドシートを **編集者** で共有する。
 
-**毎回自動でやること**: `npm run shopee-sheet:bootstrap` が `scope` / `ledger` / `asin_attempts` タブの存在確認と、**1行目ヘッダの補正**を行う（データ行は消さない）。
+**毎回自動でやること**:
+
+1. `npm run shopee-sheet:bootstrap` … `scope` / `ledger` / `asin_attempts` タブの存在確認と **1行目ヘッダの補正**（データ行は消さない）。
+2. `npm run shopee-candidate:discover-from-scope` … **`scope` の `source_url` を読み、`ledger` にまだ無い URL だけ行追加**（Amazon.co.jp の `/dp/ASIN` 等なら `current_asin` と `asin_review=pending` を入れる）。実装: リポジトリの `scripts/shopee-candidate-discover-from-scope.mjs`。
 
 その他（通知 Webhook、候補発掘用トークン等）は別 Secret で足す。
 

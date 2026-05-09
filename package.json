@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "shopee-sheet:bootstrap": "node scripts/shopee-candidate-sheet-bootstrap.mjs"
+    "shopee-sheet:bootstrap": "node scripts/shopee-candidate-sheet-bootstrap.mjs",
+    "shopee-candidate:discover-from-scope": "node scripts/shopee-candidate-discover-from-scope.mjs"
   },
   "dependencies": {
     "googleapis": "^144.0.0"

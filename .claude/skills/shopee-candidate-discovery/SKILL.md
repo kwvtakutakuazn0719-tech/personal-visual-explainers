@@ -13,7 +13,8 @@ Shopeeで出品する新たな商品候補を発掘し、**Googleスプレッド
 
 - **このスキルは手順書**。単体で毎日06:00に自動実行はしない。
 - **定期キックの主シナリオは GitHub Actions**。実行時刻は **毎日 06:00 JST** を正本とする（詳細は `references/` を参照）。
-- **スプシの形（タブ名・1行目ヘッダ）は自動維持できる**: リポジトリの `npm run shopee-sheet:bootstrap`（`scripts/shopee-candidate-sheet-bootstrap.mjs`）を Actions から毎回実行する。Secrets と共有の手順は `references/github-actions-schedule.md`。
+- **スプシの形（タブ名・1行目ヘッダ）は自動維持できる**: `npm run shopee-sheet:bootstrap`（`scripts/shopee-candidate-sheet-bootstrap.mjs`）を Actions から毎回実行する。
+- **J 第1段（自動）**: `scope` の `source_url` を `ledger` に未登録分だけ流し込む。`npm run shopee-candidate:discover-from-scope`（`scripts/shopee-candidate-discover-from-scope.mjs`）。Secrets と Actions の順序は `references/github-actions-schedule.md`。
 - **ASINが適切かの最終判断は人間ゲート**（同一ASINでもバリアント違い等があるため）。
 
 ## 依存（正本）
