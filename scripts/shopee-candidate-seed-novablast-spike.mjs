@@ -1,6 +1,6 @@
 /**
  * 試験用: `product_queue` に ASICS NOVABLAST 5 SUNNY SIZZLE の1行を入れる（dedupe_key 重複時は追記しない）。
- * PA-API があれば `product_image_url` を GetItems のメイン画像で埋める。
+ * 任意: PA-API があれば `product_image_url` を埋める（Slack 通知には使わない）。
  *
  * 環境変数:
  *   SPREADSHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON
@@ -114,7 +114,7 @@ async function main() {
       case "slack_notified_at":
         return "";
       case "notes":
-        return "試験行。SUNNY SIZZLE専用でなければ SPIKE_NOVABLAST_ASIN。画像はPA-APIまたは手入力。";
+        return "試験行。SUNNY SIZZLE専用でなければ SPIKE_NOVABLAST_ASIN。product_image_url は任意。";
       default:
         return "";
     }
@@ -129,7 +129,7 @@ async function main() {
   });
 
   console.log(
-    `seed: appended seq=${nextSeq} ASIN=${ASIN} image=${imageUrl ? "ok(PA-API)" : "EMPTY→notifyはスキップされる。PA-APIか手で画像URLを入れる"}`,
+    `seed: appended seq=${nextSeq} ASIN=${ASIN} product_image_url=${imageUrl ? "ok(PA-API)" : "empty OK for Slack"}`,
   );
 }
 

@@ -2,7 +2,8 @@
  * `product_queue` のうち、必須列がすべて埋まり `slack_notified_at` が空の行だけ
  * Slack に1回投稿し、通知日時を書き戻す。
  *
- * 必須: seq, brand, product_name, release_date, product_image_url, asin
+ * 必須: seq, brand, product_name, release_date, asin
+ * （`product_image_url` は任意・Slack では使わない）
  *
  * 環境変数: SPREADSHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON, SLACK_WEBHOOK_URL
  */
@@ -36,10 +37,6 @@ async function postSlack(blocks, fallback) {
     body: JSON.stringify({ text: fallback.slice(0, 500), blocks }),
   });
   if (!r.ok) throw new Error(`Slack ${r.status} ${await r.text()}`);
-}
-
-async function postSlackTextOnly(fallback, mrkdwn) {
-  await postSlack([{ type: "section", text: { type: "mrkdwn", text: mrkdwn } }], fallback);
 }
 
 async function getClient() {
@@ -78,11 +75,10 @@ async function main() {
     brand: colIndex(header, "brand"),
     product_name: colIndex(header, "product_name"),
     release_date: colIndex(header, "release_date"),
-    product_image_url: colIndex(header, "product_image_url"),
     asin: colIndex(header, "asin"),
     slack_notified_at: colIndex(header, "slack_notified_at"),
   };
-  for (const k of ["seq", "brand", "product_name", "release_date", "product_image_url", "asin", "slack_notified_at"]) {
+  for (const k of ["seq", "brand", "product_name", "release_date", "asin", "slack_notified_at"]) {
     if (ix[k] < 0) {
       console.error(`product_queue: missing column "${k}"`);
       process.exit(1);
@@ -96,13 +92,13 @@ async function main() {
     const brand = pick(row, ix.brand);
     const product_name = pick(row, ix.product_name);
     const release_date = pick(row, ix.release_date);
-    const product_image_url = pick(row, ix.product_image_url);
     const asin = pick(row, ix.asin);
     const slack_notified_at = pick(row, ix.slack_notified_at);
 
     if (slack_notified_at) continue;
-    if (!seq || !brand || !product_name || !release_date || !product_image_url || !asin) continue;
+    if (!seq || !brand || !product_name || !release_date || !asin) continue;
 
+    const dp = `https://www.amazon.co.jp/dp/${asin}`;
     const blocks = [
       {
         type: "header",
@@ -110,37 +106,19 @@ async function main() {
       },
       {
         type: "section",
-        fields: [
-          { type: "mrkdwn", text: `*ブランド*\n${brand}` },
-          { type: "mrkdwn", text: `*商品名*\n${product_name}` },
-          { type: "mrkdwn", text: `*発売開始日*\n${release_date}` },
-          { type: "mrkdwn", text: `*ASIN*\n\`${asin}\`` },
-        ],
-      },
-      {
-        type: "image",
-        image_url: product_image_url,
-        alt_text: product_name.slice(0, 100),
-        title: { type: "plain_text", text: product_name.slice(0, 80) },
-      },
-      {
-        type: "section",
         text: {
           type: "mrkdwn",
-          text: `<https://www.amazon.co.jp/dp/${asin}|Amazon.jp で開く>`,
+          text:
+            `*ブランド* ${brand}\n` +
+            `*商品名* ${product_name}\n` +
+            `*発売開始日* ${release_date}\n` +
+            `*ASIN* \`${asin}\`\n` +
+            `<${dp}|Amazon.jp で開く>`,
         },
       },
     ];
 
-    try {
-      await postSlack(blocks, `新着 #${seq} ${brand} ${product_name}`);
-    } catch (e1) {
-      console.error("Slack blocks failed (image等), retry text only:", e1?.message || e1);
-      await postSlackTextOnly(
-        `新着 #${seq}`,
-        `*#${seq}* ${brand} — *${product_name}*\n発売: ${release_date}\nASIN: \`${asin}\`\n<https://www.amazon.co.jp/dp/${asin}|Amazon>\n（画像ブロック拒否のためテキストのみ）`,
-      );
-    }
+    await postSlack(blocks, `新着 #${seq} ${brand} ${product_name} ${dp}`);
 
     const row1 = r + 1;
     const colLetter = String.fromCharCode("A".charCodeAt(0) + ix.slack_notified_at);
@@ -156,7 +134,7 @@ async function main() {
   }
 
   if (notified === 0) {
-    console.log("notify: no complete+unsent rows (need all fields + image URL + SLACK).");
+    console.log("notify: no complete+unsent rows (need seq, brand, product_name, release_date, asin + SLACK).");
   }
 }
 

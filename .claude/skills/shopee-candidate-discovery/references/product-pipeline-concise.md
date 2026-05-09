@@ -10,8 +10,7 @@ title: 商品パイプライン（簡潔版・正本）
 - ブランド
 - 商品名
 - 発売開始日
-- 商品画像（URL）
-- ASIN
+- ASIN（**Slack では Amazon `/dp/{ASIN}` リンクで通知。商品画像は送らない**）
 
 **1つでも欠けたら Slack は送らない**（ノイズ防止）。
 
@@ -19,8 +18,8 @@ title: 商品パイプライン（簡潔版・正本）
 
 1. **採取** … 各サイトの新着 → スプシ `product_queue` に行追加。**ブランド＋商品名**で重複は捨てる。ニューカラー／派生は別行（別キー）。
 2. **見張り** … Amazon にまだ無い期間も **毎日ジョブ**。ASIN 空のまま一覧を維持・更新。
-3. **初出品** … ある日 Amazon に出たら **ASIN と画像を埋める**（PA-API 等）。
-4. **通知** … 上の6項目が **すべて埋まり**、かつ **未通知**（`slack_notified_at` 空）のとき **初めて Slack** → 通知後に `slack_notified_at` を記録。
+3. **初出品** … ある日 Amazon に出たら **ASIN を埋める**（必要なら PA-API でスプシ用メモ等。Slack 本文は URL 中心）。
+4. **通知** … **seq / brand / product_name / release_date / asin** がすべて埋まり、かつ **未通知**（`slack_notified_at` 空）のとき **初めて Slack**（Amazon URL リンク）→ 通知後に `slack_notified_at` を記録。
 
 ## スプレッドシート
 
@@ -33,7 +32,7 @@ title: 商品パイプライン（簡潔版・正本）
    または `npm run shopee-candidate:spike-novablast` 一発。GitHub なら **Actions → `shopee-candidate-spike-novablast` → Run workflow**。
 
 - 既定 ASINは **Amazon.jp の NOVABLAST 5 メンズ代表（`B0FNBNQ634`）**。SUNNY SIZZLE 専用でなければ **Secret `SPIKE_NOVABLAST_ASIN`**（またはローカルの同名 env）で差し替え。
-- **Slack に届く条件**: `product_image_url` が空だと **通知しない**。PA-API Secrets があると seed が画像 URL を自動埋め。**無い場合は**スプシの `product_image_url` に Amazon 画像の `https://` URL を手で貼る。
+- **Slack に届く条件**: `seq` / `brand` / `product_name` / `release_date` / `asin` が揃い、`slack_notified_at` が空。**`product_image_url` は不要**（列は任意で残せる）。
 
 ## いまのコードとの位置づけ
 

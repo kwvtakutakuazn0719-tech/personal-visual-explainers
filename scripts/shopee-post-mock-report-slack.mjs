@@ -1,16 +1,13 @@
 /**
- * 図解モック画像を Slack Incoming Webhook に1枚投稿する（手動テスト用）。
- * 画像は GitHub raw（main の output/shopee-slack-report-mock.png）を参照する。
+ * Slack へ「Amazon URL 中心」のモック通知（手動テスト用・画像なし）。
  *
  * 環境変数: SLACK_WEBHOOK_URL 必須
- * 任意: MOCK_IMAGE_URL（省略時は下記 raw URL）
+ * 任意: MOCK_ASIN（既定 B0FNBNQ634）
  */
 
-const DEFAULT_RAW =
-  "https://raw.githubusercontent.com/kwvtakutakuazn0719-tech/personal-visual-explainers/main/output/shopee-slack-report-mock.png";
-
 const url = process.env.SLACK_WEBHOOK_URL;
-const imageUrl = (process.env.MOCK_IMAGE_URL || DEFAULT_RAW).trim();
+const asin = (process.env.MOCK_ASIN || "B0FNBNQ634").trim().toUpperCase();
+const dp = `https://www.amazon.co.jp/dp/${asin}`;
 
 if (!url) {
   console.error("Set SLACK_WEBHOOK_URL (Incoming Webhook) and re-run.");
@@ -18,28 +15,27 @@ if (!url) {
 }
 
 const body = {
-  text: "図解レポート（モック）",
+  text: `新着候補（モック） ${asin}`,
   blocks: [
     {
       type: "section",
       text: {
         type: "mrkdwn",
         text:
-          "*図解レポート（デザイン試し）*\n`slack-report-visual-spec.md` に沿ったモック画像です。",
+          `*新着候補（モック）*\n` +
+          `• ブランド: ASICS\n` +
+          `• 商品名: NOVABLAST 5 SUNNY SIZZLE\n` +
+          `• 発売: 2025-04-01\n` +
+          `• ASIN: \`${asin}\`\n` +
+          `• <${dp}|Amazon.jp で開く>`,
       },
-    },
-    {
-      type: "image",
-      title: { type: "plain_text", text: "新着候補レポート（モック）" },
-      image_url: imageUrl,
-      alt_text: "Shopee candidate report mock dark theme",
     },
     {
       type: "context",
       elements: [
         {
           type: "mrkdwn",
-          text: `画像URL: ${imageUrl.slice(0, 80)}…`,
+          text: "画像は使わず URL 通知。本番は `notify-product-ready` と同趣旨。",
         },
       ],
     },
