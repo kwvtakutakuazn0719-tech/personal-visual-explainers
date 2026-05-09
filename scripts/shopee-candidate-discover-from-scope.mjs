@@ -1,16 +1,24 @@
 /**
  * J（第1段）: `scope` を読み、`source_url` がまだ `ledger` に無い行だけを追記する。
  * - Amazon.co.jp の `/dp/ASIN` または `/gp/product/ASIN` なら `current_asin` を埋める。
- * - 列 `amazon_keywords` に検索語がある場合、**PA-API SearchItems** で先頭ヒットの ASIN を採用
+ * - **Jina Reader**（`https://r.jina.ai/{url}`）で非 Amazon 商品 URL の本文を取得し、
+ *   `amazon_keywords` が空なら **タイトル＋ブランド**から PA-API 用クエリを推測する（任意 `JINA_API_KEY`）。
+ * - 列 `amazon_keywords` があればそれを優先し、**PA-API SearchItems** で先頭ヒットの ASIN を採用
  *   （要: AMAZON_PA_API_* と AMAZON_ASSOCIATES_PARTNER_TAG）。誤突合防止のため `asin_review=pending`。
  *
  * 環境変数: SPREADSHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON
- * 任意: AMAZON_PA_API_ACCESS_KEY, AMAZON_PA_API_SECRET_KEY, AMAZON_ASSOCIATES_PARTNER_TAG
+ * 任意: AMAZON_PA_API_*, AMAZON_ASSOCIATES_PARTNER_TAG, JINA_API_KEY
+ * 任意: JINA_READER_DISABLED=1（Reader を使わない）, JINA_READER_MAX_PER_RUN（既定 10）
  */
 
 import { google } from "googleapis";
 import { isPaapiConfigured, searchItemsFirstHit } from "./lib/amazon-paapi-jp.mjs";
 import { formatJstYmd } from "./lib/jst-date.mjs";
+import {
+  fetchReaderMarkdown,
+  guessAmazonKeywordsFromReader,
+  parseReaderResponse,
+} from "./lib/jina-reader.mjs";
 
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const rawJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
@@ -32,6 +40,28 @@ function extractAmazonJpAsin(urlStr) {
 
 function newCandidateId() {
   return `C-${Date.now().toString(36)}-${globalThis.crypto.randomUUID().slice(0, 8)}`;
+}
+
+function jinaReaderDisabled() {
+  const v = String(process.env.JINA_READER_DISABLED ?? "").trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes";
+}
+
+function jinaMaxPerRun() {
+  const n = Number.parseInt(String(process.env.JINA_READER_MAX_PER_RUN ?? "10"), 10);
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 40) : 10;
+}
+
+function excerptForNote(text, max = 700) {
+  const t = String(text ?? "").replace(/\s+/g, " ").trim();
+  if (t.length <= max) return t;
+  return `${t.slice(0, max - 1)}…`;
+}
+
+/** Google シートのセル上限に近づかないよう切る */
+function capCell(s, max = 47000) {
+  const t = String(s ?? "");
+  return t.length <= max ? t : `${t.slice(0, max - 1)}…`;
 }
 
 async function getSheetsClient() {
@@ -95,6 +125,9 @@ async function main() {
 
   const nowIso = formatJstYmd();
   const newRows = [];
+  let jinaCalls = 0;
+  const jinaCap = jinaMaxPerRun();
+  const jinaDelayMs = 1800;
 
   for (let r = 1; r < scopeRows.length; r++) {
     const row = scopeRows[r] ?? [];
@@ -115,45 +148,143 @@ async function main() {
     let candidate_name = "";
     let signal_type = "";
 
+    let readerParsed = null;
+    let readerExcerpt = "";
+    const useJina =
+      !jinaReaderDisabled() &&
+      jinaCalls < jinaCap &&
+      /^https?:\/\//i.test(source_url) &&
+      !asin;
+
+    if (useJina) {
+      try {
+        const raw = await fetchReaderMarkdown(source_url);
+        jinaCalls += 1;
+        readerParsed = parseReaderResponse(raw);
+        readerExcerpt = excerptForNote(readerParsed.body || raw, 720);
+        if (jinaCalls < jinaCap) {
+          await new Promise((res) => setTimeout(res, jinaDelayMs));
+        }
+      } catch (e) {
+        console.error("Jina Reader failed:", source_url, e?.message || e);
+        amazon_match_note = `Jina Reader 失敗: ${String(e?.message || e).slice(0, 180)}`;
+      }
+    }
+
+    const guessedKw =
+      readerParsed && !amazon_keywords
+        ? guessAmazonKeywordsFromReader(brand, readerParsed)
+        : "";
+    const effectiveKeywords = (amazon_keywords || guessedKw).trim();
+
+    if (readerParsed?.title && !asin) {
+      candidate_name = readerParsed.title.slice(0, 200);
+      signal_type = source_type ? `${source_type}+jina` : "scope_url+jina";
+    }
+
     if (asin) {
       candidate_name = `Amazon.jp (${asin})`;
       signal_type = "amazon_listing";
-    } else if (amazon_keywords && isPaapiConfigured()) {
+    } else if (effectiveKeywords && isPaapiConfigured()) {
       try {
-        const hit = await searchItemsFirstHit(amazon_keywords);
+        const hit = await searchItemsFirstHit(effectiveKeywords);
         if (hit) {
           asin = hit.asin;
           candidate_name = (hit.title || "").slice(0, 200) || `Amazon.jp (${asin})`;
-          signal_type = "amazon_paapi_search";
-          amazon_match_note =
-            "PA-API SearchItems 先頭ヒット（asin_review は人間確認前提）";
+          signal_type = amazon_keywords ? "amazon_paapi_search" : "amazon_paapi_search+jina_kw";
+          amazon_match_note = [
+            guessedKw && !amazon_keywords
+              ? `PA-API SearchItems 先頭ヒット（クエリ推測: Jina + brand）`
+              : "PA-API SearchItems 先頭ヒット（asin_review は人間確認前提）",
+            readerExcerpt && `[Jina 抜粋] ${readerExcerpt}`,
+            amazon_match_note,
+          ]
+            .filter(Boolean)
+            .join("\n");
         } else {
-          candidate_name = `From scope (${source_type || "link"})`;
-          signal_type = source_type || "scope_url";
-          amazon_match_note =
-            "PA-API 検索結果なし（amazon_keywords を絞り込むか直リンクを検討）";
+          if (!candidate_name) {
+            candidate_name = `From scope (${source_type || "link"})`;
+          }
+          if (!signal_type || !String(signal_type).includes("jina")) {
+            signal_type = source_type || "scope_url";
+          }
+          amazon_match_note = [
+            "PA-API 検索結果なし（amazon_keywords / Jina 推測クエリを絞り込むか直リンクを検討）",
+            readerExcerpt && `[Jina 抜粋] ${readerExcerpt}`,
+            amazon_match_note,
+          ]
+            .filter(Boolean)
+            .join("\n");
         }
       } catch (e) {
         console.error("PA-API searchItems failed:", e?.message || e);
-        candidate_name = `From scope (${source_type || "link"})`;
-        signal_type = source_type || "scope_url";
-        amazon_match_note = `PA-API エラー: ${String(e?.message || e).slice(0, 200)}`;
+        if (!candidate_name) {
+          candidate_name = `From scope (${source_type || "link"})`;
+        }
+        if (!signal_type || !String(signal_type).includes("jina")) {
+          signal_type = source_type || "scope_url";
+        }
+        amazon_match_note = [
+          `PA-API エラー: ${String(e?.message || e).slice(0, 200)}`,
+          readerExcerpt && `[Jina 抜粋] ${readerExcerpt}`,
+          amazon_match_note,
+        ]
+          .filter(Boolean)
+          .join("\n");
       }
-    } else if (amazon_keywords && !isPaapiConfigured()) {
-      candidate_name = `From scope (${source_type || "link"})`;
-      signal_type = source_type || "scope_url";
-      amazon_match_note =
-        "amazon_keywords あり。GitHub Secrets に AMAZON_PA_API_* と AMAZON_ASSOCIATES_PARTNER_TAG を設定すると自動突合";
+    } else if ((amazon_keywords || guessedKw) && !isPaapiConfigured()) {
+      if (!candidate_name) {
+        candidate_name = `From scope (${source_type || "link"})`;
+      }
+      if (!signal_type || !String(signal_type).includes("jina")) {
+        signal_type = source_type || "scope_url";
+      }
+      const hint = amazon_keywords
+        ? "amazon_keywords あり。GitHub Secrets に AMAZON_PA_API_* と AMAZON_ASSOCIATES_PARTNER_TAG を設定すると自動突合"
+        : `Jina から検索語候補を推測（${guessedKw.slice(0, 100)}）— PA-API の Secrets を入れると自動突合`;
+      amazon_match_note = [
+        hint,
+        readerExcerpt && `[Jina 抜粋] ${readerExcerpt}`,
+        amazon_match_note,
+      ]
+        .filter(Boolean)
+        .join("\n");
     } else {
-      candidate_name = `From scope (${source_type || "link"})`;
-      signal_type = source_type || "scope_url";
+      if (!candidate_name) {
+        candidate_name = `From scope (${source_type || "link"})`;
+      }
+      if (!signal_type) signal_type = source_type || "scope_url";
+      if (readerExcerpt && !amazon_match_note) {
+        amazon_match_note = `[Jina 抜粋] ${readerExcerpt}`;
+      } else if (readerExcerpt) {
+        amazon_match_note = [amazon_match_note, `[Jina 抜粋] ${readerExcerpt}`]
+          .filter(Boolean)
+          .join("\n");
+      }
+      if (!effectiveKeywords && readerParsed && !isPaapiConfigured()) {
+        amazon_match_note = [
+          amazon_match_note,
+          "PA-API 未設定のため ASIN 自動突合なし（キーを入れると Jina 推測クエリで検索）",
+        ]
+          .filter(Boolean)
+          .join("\n");
+      } else if (effectiveKeywords && !readerParsed && !isPaapiConfigured()) {
+        amazon_match_note = [
+          amazon_match_note,
+          "PA-API 未設定（Jina 未取得のため検索語推測なし）",
+        ]
+          .filter(Boolean)
+          .join("\n");
+      }
     }
 
     const confidence_note = [
       "auto: scope import",
+      readerParsed ? "jina=1" : useJina ? "jina=fail" : "",
       priority && `priority=${priority}`,
       notes && `notes=${notes}`,
-      amazon_keywords && !asin && `keywords=${amazon_keywords}`,
+      amazon_keywords && `keywords=${amazon_keywords}`,
+      guessedKw && !amazon_keywords && `guessed_kw=${guessedKw.slice(0, 120)}`,
     ]
       .filter(Boolean)
       .join(" | ");
@@ -162,10 +293,10 @@ async function main() {
       newCandidateId(),
       category,
       brand,
-      candidate_name,
+      capCell(candidate_name, 500),
       source_url,
       signal_type,
-      confidence_note,
+      capCell(confidence_note, 2000),
       nowIso,
       "new",
       asin,
@@ -175,7 +306,7 @@ async function main() {
       "", // next_asin_reseek_at
       "", // asin_reseek_deadline
       "", // asin_reseek_attempts
-      amazon_match_note,
+      capCell(amazon_match_note, 48000),
       "", // model_code
       "", // variant_note
       nowIso,

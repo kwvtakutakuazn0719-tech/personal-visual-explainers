@@ -30,6 +30,7 @@ Shopeeで出品する新たな商品候補を発掘し、**Googleスプレッド
 - `references/source-risks.md` — 安定性/壊れやすさ/規約・ログイン壁の整理
 - `references/sp-api-pointer.md` — SP-API / Shopee API の位置づけ（リンク集）
 - `references/spike-amazon-jp.md` — Amazon.co.jp 突合の短い検証（スパイク）
+- `references/jina-reader.md` — Jina Reader（r.jina.ai）の呼び方・Secrets・注意
 
 ## 入力（あなたが用意するもの）
 
