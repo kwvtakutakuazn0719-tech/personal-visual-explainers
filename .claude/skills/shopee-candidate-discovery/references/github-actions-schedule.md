@@ -26,15 +26,20 @@ title: GitHub Actions schedule (pointers)
 |-----------|------|
 | `SPREADSHEET_ID` | 対象ブックの ID（URL の `/d/` と次の `/` の間） |
 | `GOOGLE_SERVICE_ACCOUNT_JSON` | Google Cloud の **サービスアカウント鍵 JSON を1本の文字列**として貼る（改行含めて可） |
+| `AMAZON_PA_API_ACCESS_KEY` | （任意）Product Advertising API 5.0 のアクセスキー。`scope.amazon_keywords` からの自動 ASIN 突合に使用。 |
+| `AMAZON_PA_API_SECRET_KEY` | （任意）上に対応するシークレットキー。 |
+| `AMAZON_ASSOCIATES_PARTNER_TAG` | （任意）アソシエイトのストアID（日本向け例: `mysite-22`）。PA-API では必須。 |
+| `SLACK_WEBHOOK_URL` | （任意）[Slack Incoming Webhook](https://api.slack.com/messaging/webhooks) の URL。朝レポートを投稿。 |
 
 **共有**: そのサービスアカウントのメールアドレスに、スプレッドシートを **編集者** で共有する。
 
 **毎回自動でやること**:
 
 1. `npm run shopee-sheet:bootstrap` … `scope` / `ledger` / `asin_attempts` タブの存在確認と **1行目ヘッダの補正**（データ行は消さない）。
-2. `npm run shopee-candidate:discover-from-scope` … **`scope` の `source_url` を読み、`ledger` にまだ無い URL だけ行追加**（Amazon.co.jp の `/dp/ASIN` 等なら `current_asin` と `asin_review=pending` を入れる）。実装: リポジトリの `scripts/shopee-candidate-discover-from-scope.mjs`。
+2. `npm run shopee-candidate:discover-from-scope` … **`scope` → `ledger`**（未登録の `source_url` のみ）。Amazon 直リンクなら ASIN 抽出。`amazon_keywords` ＋ PA-API Secrets なら **SearchItems 先頭ヒット**で ASIN を入れる（`asin_review=pending`）。実装: `scripts/shopee-candidate-discover-from-scope.mjs`。
+3. `npm run shopee-candidate:daily-digest` … **当日 JST の `discovered_at` 行**を集約し、PA-API でタイトル・画像を付けて **GitHub Job Summary** と **Slack（任意）** に出す。実装: `scripts/shopee-candidate-daily-digest.mjs`。
 
-その他（通知 Webhook、候補発掘用トークン等）は別 Secret で足す。
+**注意（PA-API）**: 公式に **2026-05-15 で PA-API 廃止予定**とあり、**Creators API** への移行が案内されている。中長期は Creators API または SP-API 側の設計に寄せること。
 
 ## workflow_dispatch
 

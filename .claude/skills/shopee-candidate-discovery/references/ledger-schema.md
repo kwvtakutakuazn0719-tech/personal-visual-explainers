@@ -15,7 +15,7 @@ title: Ledger schema (SSOT)
 - `source_url`: 根拠URL（最低1つ）
 - `signal_type`: 根拠の種類（new_release / review / buzz / shopee_signal / other）
 - `confidence_note`: 信頼度メモ（短文）
-- `discovered_at`: 発見日時
+- `discovered_at`: 発見日（**Actions では JST の暦日 `YYYY-MM-DD`**。ダイジェストの「本日」と一致させるため）
 - `status`: 行の状態（詳細は `workflow-states.md`）
 
 ## ASINゲート（今回の要件）

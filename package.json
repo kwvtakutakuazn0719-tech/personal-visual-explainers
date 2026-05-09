@@ -4,9 +4,11 @@
   "type": "module",
   "scripts": {
     "shopee-sheet:bootstrap": "node scripts/shopee-candidate-sheet-bootstrap.mjs",
-    "shopee-candidate:discover-from-scope": "node scripts/shopee-candidate-discover-from-scope.mjs"
+    "shopee-candidate:discover-from-scope": "node scripts/shopee-candidate-discover-from-scope.mjs",
+    "shopee-candidate:daily-digest": "node scripts/shopee-candidate-daily-digest.mjs"
   },
   "dependencies": {
-    "googleapis": "^144.0.0"
+    "googleapis": "^144.0.0",
+    "paapi5-nodejs-sdk": "^1.1.0"
   }
 }

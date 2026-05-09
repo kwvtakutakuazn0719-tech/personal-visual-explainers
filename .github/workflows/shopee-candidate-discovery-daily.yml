@@ -2,7 +2,8 @@
 # JST = UTC+9 のため、JST 06:00 は前日 UTC 21:00 に相当する。
 # 毎日 JST 06:00:
 #   1) タブとヘッダを冪等で維持（bootstrap）
-#   2) scope の URL を ledger に取り込み（J 第1段: discover-from-scope）
+#   2) scope → ledger（PA-API で amazon_keywords 突合可）
+#   3) 本日分のダイジェスト（Job Summary + 任意 Slack）
 
 name: shopee-candidate-discovery-daily
 
@@ -37,4 +38,17 @@ jobs:
         env:
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          AMAZON_PA_API_ACCESS_KEY: ${{ secrets.AMAZON_PA_API_ACCESS_KEY }}
+          AMAZON_PA_API_SECRET_KEY: ${{ secrets.AMAZON_PA_API_SECRET_KEY }}
+          AMAZON_ASSOCIATES_PARTNER_TAG: ${{ secrets.AMAZON_ASSOCIATES_PARTNER_TAG }}
         run: npm run shopee-candidate:discover-from-scope
+
+      - name: Daily digest (cards + Slack optional)
+        env:
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          AMAZON_PA_API_ACCESS_KEY: ${{ secrets.AMAZON_PA_API_ACCESS_KEY }}
+          AMAZON_PA_API_SECRET_KEY: ${{ secrets.AMAZON_PA_API_SECRET_KEY }}
+          AMAZON_ASSOCIATES_PARTNER_TAG: ${{ secrets.AMAZON_ASSOCIATES_PARTNER_TAG }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: npm run shopee-candidate:daily-digest

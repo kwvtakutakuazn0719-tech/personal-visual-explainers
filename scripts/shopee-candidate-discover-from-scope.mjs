@@ -1,12 +1,16 @@
 /**
- * J（第1段）: `scope` シートを読み、`source_url` がまだ `ledger` に無い行だけを追記する。
- * - Amazon.co.jp の `/dp/ASIN` または `/gp/product/ASIN` 形式なら `current_asin` を埋める。
- * - 公式・ブログ等の URL は ASIN なしで1行追加（人間があとで突合・メモする入口）。
+ * J（第1段）: `scope` を読み、`source_url` がまだ `ledger` に無い行だけを追記する。
+ * - Amazon.co.jp の `/dp/ASIN` または `/gp/product/ASIN` なら `current_asin` を埋める。
+ * - 列 `amazon_keywords` に検索語がある場合、**PA-API SearchItems** で先頭ヒットの ASIN を採用
+ *   （要: AMAZON_PA_API_* と AMAZON_ASSOCIATES_PARTNER_TAG）。誤突合防止のため `asin_review=pending`。
  *
- * 環境変数: SPREADSHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON（bootstrap と同じ）
+ * 環境変数: SPREADSHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON
+ * 任意: AMAZON_PA_API_ACCESS_KEY, AMAZON_PA_API_SECRET_KEY, AMAZON_ASSOCIATES_PARTNER_TAG
  */
 
 import { google } from "googleapis";
+import { isPaapiConfigured, searchItemsFirstHit } from "./lib/amazon-paapi-jp.mjs";
+import { formatJstYmd } from "./lib/jst-date.mjs";
 
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const rawJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
@@ -49,7 +53,7 @@ async function main() {
 
   const scopeRes = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: "scope!A1:F500",
+    range: "scope!A1:G500",
   });
   const scopeRows = scopeRes.data.values ?? [];
   if (scopeRows.length < 2) {
@@ -69,6 +73,7 @@ async function main() {
     source_url: col("source_url"),
     priority: col("priority"),
     notes: col("notes"),
+    amazon_keywords: col("amazon_keywords"),
   };
   if (ix.source_url < 0) {
     console.error('scope sheet: missing "source_url" column in header');
@@ -77,7 +82,7 @@ async function main() {
 
   const ledgerRes = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: "ledger!A1:W2000",
+    range: "ledger!A1:V2000",
   });
   const ledgerRows = ledgerRes.data.values ?? [];
   const existingUrls = new Set();
@@ -88,7 +93,7 @@ async function main() {
     if (u) existingUrls.add(String(u).trim());
   }
 
-  const nowIso = new Date().toISOString().slice(0, 10);
+  const nowIso = formatJstYmd();
   const newRows = [];
 
   for (let r = 1; r < scopeRows.length; r++) {
@@ -103,16 +108,52 @@ async function main() {
     const source_type = get(ix.source_type);
     const priority = get(ix.priority);
     const notes = get(ix.notes);
-    const asin = extractAmazonJpAsin(source_url);
+    const amazon_keywords = get(ix.amazon_keywords);
 
-    const candidate_name = asin
-      ? `Amazon.jp (${asin})`
-      : `From scope (${source_type || "link"})`;
-    const signal_type = asin ? "amazon_listing" : source_type || "scope_url";
+    let asin = extractAmazonJpAsin(source_url);
+    let amazon_match_note = "";
+    let candidate_name = "";
+    let signal_type = "";
+
+    if (asin) {
+      candidate_name = `Amazon.jp (${asin})`;
+      signal_type = "amazon_listing";
+    } else if (amazon_keywords && isPaapiConfigured()) {
+      try {
+        const hit = await searchItemsFirstHit(amazon_keywords);
+        if (hit) {
+          asin = hit.asin;
+          candidate_name = (hit.title || "").slice(0, 200) || `Amazon.jp (${asin})`;
+          signal_type = "amazon_paapi_search";
+          amazon_match_note =
+            "PA-API SearchItems 先頭ヒット（asin_review は人間確認前提）";
+        } else {
+          candidate_name = `From scope (${source_type || "link"})`;
+          signal_type = source_type || "scope_url";
+          amazon_match_note =
+            "PA-API 検索結果なし（amazon_keywords を絞り込むか直リンクを検討）";
+        }
+      } catch (e) {
+        console.error("PA-API searchItems failed:", e?.message || e);
+        candidate_name = `From scope (${source_type || "link"})`;
+        signal_type = source_type || "scope_url";
+        amazon_match_note = `PA-API エラー: ${String(e?.message || e).slice(0, 200)}`;
+      }
+    } else if (amazon_keywords && !isPaapiConfigured()) {
+      candidate_name = `From scope (${source_type || "link"})`;
+      signal_type = source_type || "scope_url";
+      amazon_match_note =
+        "amazon_keywords あり。GitHub Secrets に AMAZON_PA_API_* と AMAZON_ASSOCIATES_PARTNER_TAG を設定すると自動突合";
+    } else {
+      candidate_name = `From scope (${source_type || "link"})`;
+      signal_type = source_type || "scope_url";
+    }
+
     const confidence_note = [
       "auto: scope import",
       priority && `priority=${priority}`,
       notes && `notes=${notes}`,
+      amazon_keywords && !asin && `keywords=${amazon_keywords}`,
     ]
       .filter(Boolean)
       .join(" | ");
@@ -134,7 +175,7 @@ async function main() {
       "", // next_asin_reseek_at
       "", // asin_reseek_deadline
       "", // asin_reseek_attempts
-      "", // amazon_match_note
+      amazon_match_note,
       "", // model_code
       "", // variant_note
       nowIso,

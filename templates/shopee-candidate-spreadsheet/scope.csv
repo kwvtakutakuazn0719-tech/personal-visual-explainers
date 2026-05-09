@@ -1,4 +1,4 @@
-category,brand,source_type,source_url,priority,notes
-running,asics,official,https://example.com/asics-news,high,公式の新作・ニュース欄のURLに差し替える
-running,asics,blog,https://example.com/review-blog,mid,よく見るブログの一覧URLに差し替える
-trailrunning,salomon,ec,https://example.com/shop-category,mid,ECのブランド絞り込みURLに差し替える
+category,brand,source_type,source_url,priority,notes,amazon_keywords
+running,asics,official,https://example.com/asics-news,high,公式の新作・ニュース欄のURLに差し替える,"asics 新作 シューズ"
+running,asics,blog,https://example.com/review-blog,mid,よく見るブログの一覧URLに差し替える,
+trailrunning,salomon,ec,https://example.com/shop-category,mid,ECのブランド絞り込みURLに差し替える,salomon トレイル シューズ

@@ -14,7 +14,8 @@ Shopeeで出品する新たな商品候補を発掘し、**Googleスプレッド
 - **このスキルは手順書**。単体で毎日06:00に自動実行はしない。
 - **定期キックの主シナリオは GitHub Actions**。実行時刻は **毎日 06:00 JST** を正本とする（詳細は `references/` を参照）。
 - **スプシの形（タブ名・1行目ヘッダ）は自動維持できる**: `npm run shopee-sheet:bootstrap`（`scripts/shopee-candidate-sheet-bootstrap.mjs`）を Actions から毎回実行する。
-- **J 第1段（自動）**: `scope` の `source_url` を `ledger` に未登録分だけ流し込む。`npm run shopee-candidate:discover-from-scope`（`scripts/shopee-candidate-discover-from-scope.mjs`）。Secrets と Actions の順序は `references/github-actions-schedule.md`。
+- **朝の自動パイプライン（GitHub Actions）**: `bootstrap` → **`scope`→`ledger` 取り込み**（`npm run shopee-candidate:discover-from-scope`）→ **当日分ダイジェスト**（`npm run shopee-candidate:daily-digest`）。ダイジェストは **Job Summary** と任意の **Slack Webhook**。詳細は `references/github-actions-schedule.md`。
+- **Amazon 自動突合（機械）**: `source_url` が Amazon 直リンクなら ASIN 抽出。ブログ等の URL と別に、列 **`amazon_keywords`** に検索語を入れ **PA-API SearchItems** で先頭 ASIN を入れる（Secrets 要）。**誤突合があり得る**ため `asin_review=pending` を正とする。
 - **ASINが適切かの最終判断は人間ゲート**（同一ASINでもバリアント違い等があるため）。
 
 ## 依存（正本）
@@ -40,11 +41,9 @@ Shopeeで出品する新たな商品候補を発掘し、**Googleスプレッド
 ## 成果物（毎回のアウトプット）
 
 - 台帳 `ledger` の **新規行追加** または **既存行更新**
-- 完了報告（テキスト）:
-  - 新規候補の要点（候補名、ブランド、カテゴリ）
-  - 根拠URL（最低1つ）
-  - Amazon突合結果（ASINあり/なし/要確認）
-  - **人間レビューが必要な点**（例: ASIN候補が複数、バリアント疑い）
+- **毎朝 06:00 JST（Actions）**: 当日分の **簡易プロダクトカード風ダイジェスト**（タイトル・画像・ASIN・根拠リンク）。Slack を入れていれば同内容を投稿。
+- エージェントが手で書く完了報告（任意・補足）:
+  - **人間レビューが必要な点**（例: PA-API 先頭1件がバリアント違いの疑い）
 
 ## ワークフロー（毎日06:00の調査ラン）
 
@@ -73,8 +72,8 @@ Shopeeで出品する新たな商品候補を発掘し、**Googleスプレッド
 
 ### Step 4: Amazon.co.jp を突合する（ASIN取得）
 
-- Amazonに存在するか確認し、ASIN候補を台帳に記録する。
-- ASINの適合は **人間レビュー待ち** として `asin_review=pending` を基本にする。
+- **自動**: 直リンクの ASIN 抽出、または `amazon_keywords` ＋ PA-API の先頭ヒット。
+- **人間**: ASINの適合は **`asin_review=pending`** を起点に、採否だけを朝に更新する。
 
 ### Step 5: 人間ゲート（採用/却下）を台帳で回す
 

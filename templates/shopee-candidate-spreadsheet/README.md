@@ -28,4 +28,8 @@ Google スプレッドシートはこちらからあなたのアカウント上�
 
 手順の詳細: `.claude/skills/shopee-candidate-discovery/references/github-actions-schedule.md`
 
-**まだ自動ではない部分**: 候補の発掘・Amazon 突合・`ledger` への新規行追加は、次の拡張として別ジョブまたは外部ツールに繋ぐ（人間は ASIN の採否など判断だけ）。
+**自動で動く部分（Actions）**: `scope` → `ledger` への取り込み、`source_url` が Amazon 直リンクなら ASIN 抽出、列 **`amazon_keywords`** があれば **PA-API** で先頭 ASIN を突合（Secrets 要）。その後 **本日分ダイジェスト**を Job Summary（＋任意で Slack）に出す。
+
+**人間が触る部分**: `asin_review` の採否（同一 ASIN でもバリアント違いがあり得るため）。
+
+`scope` の `amazon_keywords` は「ブログ URL と別に、Amazon 検索に投げる語句（ブランド＋型番など）」を入れる想定。

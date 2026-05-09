@@ -22,6 +22,7 @@ const HEADERS = {
     "source_url",
     "priority",
     "notes",
+    "amazon_keywords",
   ],
   ledger: [
     "candidate_id",
