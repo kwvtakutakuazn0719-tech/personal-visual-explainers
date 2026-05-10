@@ -1,2 +1,0 @@
-candidate_id,category,brand,candidate_name,source_url,signal_type,confidence_note,discovered_at,status,current_asin,asin_review,asin_reject_reason,first_reject_at,next_asin_reseek_at,asin_reseek_deadline,asin_reseek_attempts,amazon_match_note,model_code,variant_note,updated_at,updated_by,cancel_reason
-C-00001,running,asics,（例）新作モデル名をここに,https://example.com/evidence,new_release,公式掲載・発売日明記,2026-05-09,new,,pending,,,,,0,,,,2026-05-09,you,
