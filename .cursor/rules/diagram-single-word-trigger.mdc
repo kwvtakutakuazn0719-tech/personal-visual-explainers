@@ -1,0 +1,108 @@
+---
+description: Exact trigger rule for the single word "図解" in this workspace
+alwaysApply: true
+---
+
+# `図解` Exact Trigger
+
+This rule applies to every chat in this workspace.
+
+- If the user's message, after trimming leading and trailing whitespace, is **exactly** `図解`, always treat it as a special trigger.
+- In that exact case, **do not** ask an open-ended follow-up like "何を図解したいですか？" and **do not** start generating immediately.
+- Instead, present these fixed choices and wait for the user's selection:
+  - `汎用図解`
+  - `アウトドア図解`
+  - `既存HTMLの公開`
+  - `図解の削除`
+- Use `AskQuestion` to present the choices.
+
+**補足**: 上の「曖昧な一問だけで始めない」は **四択メニューより前**（メッセージがちょうど「図解」だけの瞬間）の話。**「汎用図解」を選んだあと**は、下記「汎用図解（選択後）」どおり **何についての図解かを必ず確認してから**本編に入る。
+
+## Exact-match requirement
+
+- This trigger must fire **only** when the message is exactly `図解`.
+- If even one extra character or word is present, this trigger does **not** apply.
+- Examples that **must trigger**:
+  - `図解`
+- Examples that **must not trigger**:
+  - `図解して`
+  - `図解を作って`
+  - `MCPを図解して`
+  - `図解 `
+    after trimming, this becomes `図解`, so it **does** trigger
+
+## Behavior after selection
+
+- `汎用図解` → **下記「汎用図解（選択後）」を経てから**、`creating-visual-explainers` スキルに従う
+- `アウトドア図解` → follow the Shopee outdoor explainer workflow（`shopee-outdoor-explainer` スキル）
+- `既存HTMLの公開` → **下記「既存HTMLの公開（選択後）」に従う。自由記述だけで対象を決めない。**
+- `図解の削除` → **下記「図解の削除（選択後）」に従う。自由記述だけで対象を決めない。**
+
+---
+
+## 汎用図解（選択後）
+
+**目的**: **何についての図解か**が確定してから、`creating-visual-explainers` の本編（Step 0 以降）に入る。
+
+### 必須（この順）
+
+1. **トピック未確定のまま** `creating-visual-explainers` の Step 0 以降（テンプレ確認・検索・生成）に **進まない**。
+2. **同じ会話内に、図解したい対象がすでに具体的に書かれているか**判断する。
+   - **書かれている** → エージェントが **一文で要約**し、「この内容で汎用図解を進めます」と伝える。**AskQuestion** で **この内容で進む**／**テーマを変える（次のメッセージで送る）** のいずれかを選ばせる。**進む**が選ばれるまで本編に入らない。
+   - **書かれていない／曖昧** → **テーマ確定フェーズ**に入る:
+     - ユーザーに **図解のテーマを一文以上で具体的に**書いてもらう（例文を 1 つ添える。**「何でもいいですよ」だけの曖昧さ防止**）。
+     - 必要なら **想定読者** または **この一枚で伝えたいゴール**を、**追加で 1 問まで**だけ聞く（質問攻めにしない）。
+3. ユーザーの返信を待つ。**テーマが空・拒否・まだ曖昧**なら、本編に入らず **具体化を再度依頼**する。
+4. **テーマが確定したあと**で初めて、`creating-visual-explainers` スキル（generic visual explainer workflow）に従う。
+
+---
+
+## 既存HTMLの公開（選択後）
+
+**目的**: 手元の HTML を Surge 等に出す。**半端な生成物を一括公開しない。**
+
+### 必須（この順）
+
+1. **現ワークスペースのルート**を基準に、公開候補を **ツールで列挙**する（例: `Glob` で `output/**/*.html`、`.git` / `node_modules` は除外）。
+   - 汎用図解の単一ファイル形式（`output/{スラッグ}.html`）と、`output/shopee/...` 配下の HTML が混在してよい。
+   - **候補が 0 件**のときは、次の一文を含めて **終了**する:  
+     **「公開候補となる HTML が見つかりませんでした。`output/` 以下に `.html` があるか確認してください。」**  
+     推測で surge を実行しない。
+2. 候補ごとに **パス**と（分かれば）**最終更新日時**を短く整理して示す。**いきなり surge を実行しない。**
+3. **AskQuestion** で、ユーザーが **明示的に選べる形**にする:
+   - 候補が **1〜12 件**程度なら、**各ファイル（またはデプロイ単位）を 1 選択肢ずつ**出す（ラベルにパスと日付の要約を含める）。
+   - **13 件以上**、または一画面に収まらないときは **先に範囲を絞る AskQuestion** を出す。例:
+     - 「一覧の **先頭から最大 8 件**だけ選ぶ」
+     - 「**日付範囲**で絞る（次のメッセージで `yyyy-mm-dd` の開始日・終了日を送ってください）」
+     - 「**中止**」
+     - 日付で絞った後、再度 **AskQuestion** で個別指定。
+4. ユーザーが選んだ **1 件（または明示スコープ内のみ）**に対してだけ、`references/publishing.md` の公開コマンドを実行する。
+5. **ユーザーが選んでいない候補に対して surge を実行してはならない。**
+
+---
+
+## 図解の削除（選択後）
+
+**目的**: Surge 上の公開を止める（`teardown`）。**対象が曖昧なまま一括削除しない。**
+
+### 必須（この順）
+
+1. リポジトリ直下の **`deploy-history.log`** を読む（無ければ「ログファイルがありません」と明示）。
+2. ログ行から **URL 一覧**を抽出する。形式が `YYYY-MM-DD HH:MM:SS | https://...` のときは **日時**も候補の属性として使う。
+3. **削除対象が 0 件**のときは、次を含めて **終了**する:  
+   **「`deploy-history.log` から削除対象の URL を特定できませんでした。Surge のドメインが分かる場合は、その URL またはドメインを送ってください。」**  
+   推測で `teardown` を乱発しない。
+4. **AskQuestion** で **削除の単位（スコープ）**を必ず選ばせる。例（プロンプトに合わせてよいが、必ず「単一」「範囲」「全件」「中止」を区別する）:
+   - **単一**: 一覧から **1 URL だけ**選ぶ（次の AskQuestion で各 URL を選択肢にする。件数が多いときは先に日付で絞る）。
+   - **日付範囲**: ログのタイムスタンプが **`yyyy-mm-dd` で解釈できる行だけ**を対象に、ユーザーに **開始日・終了日**を送ってもらったうえで、その範囲に入る **すべての URL** を削除候補として **一覧で確認**し、**最終確認の AskQuestion**（実行する／中止）を出す。
+   - **ログ記載の URL をすべて teardown**: **危険度が高い**ため、**必ず「本当に全件か」確認の AskQuestion** を挟む。実行しない／実行する（全件）の二択以上。
+   - **中止**
+5. スコープ確定後、**`publishing.md` の `npx surge teardown [ドメイン]`** に従い、**選ばれたドメインだけ**実行する。選ばれていない URL に対して teardown してはならない。
+
+---
+
+## 共通禁止事項
+
+- **「パスを自由に書いて」だけで公開・削除を進めない**（候補列挙と AskQuestion または明確な一覧＋確定が先）。
+- **候補ゼロのときは「無い」とはっきり伝えて終了**する。
+- **一括処理はユーザーがスコープで明示した場合のみ**（公開も削除も）。

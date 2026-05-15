@@ -68,6 +68,22 @@ description: >-
 
 **キャンプギア等、サイズ表が本質でない商品**では Step 4b をスキップし、**Size Guide を入れない**（上記 README の免除に従う）。
 
+### Step 4c: Shopee プロダクト名の下書き
+
+収集した調査結果を使い、**`../shopee-explainer-common/references/shopee-product-listing-title.md`** のルールで  
+**英語 1 行・100 文字以内**の Shopee プロダクト名を作る。
+
+### Step 4d: SEO / AEO レビュー
+
+**`.claude/skills/shopee-product-name-seo-aeo-review/SKILL.md`** と  
+**`.claude/skills/shopee-product-name-seo-aeo-review/references/seo-aeo-rubric.md`** を読み、Step 4c の下書きを点検する。  
+**必須修正**と **改版ヒント**を内部で確定し、完了報告にはレビュー長文を出さない。
+
+### Step 4e: Shopee プロダクト名の確定
+
+Step 4d の結果を反映して **最終行**を作り直し、**100 文字以内**で再カウントする。  
+完了報告に出すコードブロックは **この Step 4e 確定版のみ**。
+
 ### Step 5: 画像を `output/shopee/{product-slug}/` に保存
 
 `variation-01.png` から連番。HTML の `<img>` は `./variation-XX.png`。
@@ -104,7 +120,8 @@ description: >-
 
 ### Step 9: 完了報告
 
-`../shopee-explainer-common/references/shopee-generation-ssot.md` の **完了報告テンプレ** をそのまま使う。
+`../shopee-explainer-common/references/shopee-generation-ssot.md` の **完了報告テンプレ** をそのまま使う。  
+このテンプレには **HTML 2 枚 + Shopee プロダクト名コードブロック** が含まれるため、省略しない。
 
 ## 守ること（カテゴリ＋共通）
 

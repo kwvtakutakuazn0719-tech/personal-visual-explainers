@@ -1,152 +1,39 @@
 <!--
-  メイン画像テンプレート（800×800px・1:1）
+  メイン画像テンプレート（1200×1200px・1:1）
   ============================================================
-  このファイルはAIが main-image-{slug}.html を生成する際の構成見本。
-  実際に生成する際はこのコメントをすべて除去し、商品情報で置き換えること。
+  AI が main-image-{slug}.html を生成する際の構成見本。生成時は本コメントをすべて除去すること。
 
-  ■ キャッチフレーズ帯（青）の配置パターン選択
-    ─────────────────────────────────────────────────
-    商品写真の向きに応じて2パターンを使い分ける。
-    判断基準: 添付画像の主役（製品）が横方向に長いか縦方向に長いかで判断する。
+  ■ 固定レイアウト（全商品共通）
+    - `body` 直下に **`.artboard`** を置き、`html` / `body` / `.artboard` を **1200×1200 固定**にする。
+    - **`.artboard` は外枠フレーム込み**のアートボード。Shopee の `main-image` では常に外枠フレームを出す。
+    - スクリーンショットは **`.artboard` を選択して `Capture node screenshot`** を使う。`Capture full size screenshot` はビューポート幅ぶんの余白を含みやすい。
+    - ルート **`#shopee-main-canvas`** は **フレームの内側キャンバス**として配置する。外枠だけ追加し、内側の座標を古い 800 基準のまま残さない。
+    - 各ブロックは **絶対配置**にする。値はピクセル直書きではなく、**内側キャンバス全体に対する比率**で置く。
+    - **必須**: ヒーロー、キャッチ帯、右列、ギャラリー、フッターなどの**主要な色面どうしを直接接触させない**。`#shopee-main-canvas` の白地を細いガターとして見せ、**ごく小さい余白**で必ず分離する。
+    - **必須**: 上記の主要ブロックは**角を少しだけ丸める**。丸みは控えめでよいが、角が尖ったベタ面に戻さない。
+    - ガター幅と角丸は **CSS 変数で共通管理**し、商品ごとに場当たり的な値を混在させない。
+    - 800基準の比率:
+      - Hero: `height:12%`
+      - Catch band: `top:12%; width:76.25%; height:7.75%`
+      - Main image area: `top:19.75%; width:76.25%; height:51.5%`
+      - Right feature rail: `top:12%; left:76.25%; width:23.75%; height:59.25%`
+      - Gallery: `top:71.25%; width:100%; height:18.5%`
+      - Footer: `top:89.75%; width:100%; height:10.25%`
 
-    【Layout A: 横長商品（ランドスケープ）】
-    シューズ・バッグ・横向きアウトドアギア・道具類など
-    ┌──────────────────────────────────┐  96px   ヒーロー
-    ├───────────────────────┬──────────┤
-    │ ████ キャッチフレーズ ██│          │  62px   青帯（左カラムのみ）
-    ├───────────────────────┤フィーチャー│
-    │  メイン画像              │カード3枚  │  ~395px
-    ├───────┬───────┬───┬───┤（右カラム  │  165px
-    │sub1   │sub2   │sub│+N │通し622px）│
-    ├───────┴───────┴───┴───┴──────────┤  82px   フッター
-    └──────────────────────────────────┘
+  ■ 下段ギャラリー（Section 3）
+    - variation-total==1 かつ画像1枚のみ → **Section 3 ごと省略**。そのときメイン画像は `top:19.75%; height:70%`、右列は `top:12%; height:77.75%` に変更する。
+    - 上記の省略時も、**メイン画像・右列・ヒーロー・フッターの白ガターと控えめな角丸は維持**する。
+    - それ以外の省略・Others・01/02の重複禁止・ラベル区分などは従来どおり（必要なら shopee-generation-ssot.md を参照）。
 
-    【Layout B: 縦長商品（ポートレート）】
-    アパレル・背の高い製品・縦向き写真など
-    ┌──────────────────────────────────┐  96px   ヒーロー
-    ├───────────────────────┬──────────┤
-    │  メイン画像              │フィーチャー│  ~457px
-    │  ┌────────────────┐    │カード3枚  │
-    │  │█ キャッチ      │    │（右カラム  │
-    │  │  フレーズ      │    │通し622px）│
-    │  │  （左下オーバ  │    │          │
-    │  │   レイ）       │    │          │
-    │  └────────────────┘    │          │
-    ├───────┬───────┬───┬───┤          │  165px
-    │sub1   │sub2   │sub│+N │          │
-    ├───────┴───────┴───┴───┴──────────┤  82px   フッター
-    └──────────────────────────────────┘
-
-  ■ キャッチフレーズの内容
-    - 商品の最重要価値提案を英語1〜2文で（目安: 3〜6語 × 最大2行）
-    - 公式サイト・Amazonページのキャッチコピーを参照して決定する
-    - 見た瞬間に「これはこういう商品だ」とわかる言葉にする
-    - 例: "Designed for Water. Worn Everywhere." / "Run Longer. Recover Faster."
-
-  ■ キャッチフレーズ帯のスタイル（Layout A: 横帯）
-    - height: 62px  padding: 0 20px
-    - メインテキスト: color:#FFFFFF, font-size:20px, font-weight:900, line-height:1.2
-    - サブテキスト（2行目など）: メインより少し明るいアクセント色
-    - 【配色はデザイナーとして最善を判断する】青にこだわらない。
-      ブランドカラー・商品カテゴリ・全体の配色バランスを見て決める。
-      例: ナチュラル系 → ダークグリーン / アウトドア → チャコール / スポーツ → 深紅 など
-      文字の可読性（コントラスト比）を必ず確保すること。
-
-  ■ キャッチフレーズ帯のスタイル（Layout B: 左下オーバーレイ）
-    - メイン画像コンテナ内に position:absolute で配置
-    - background: rgba(15,23,42,0.82)  bottom:0  left:0  right:0（または一部幅）
-    - padding: 10px 16px  border-radius: 0 0 0 12px（カード左下角に合わせる）
-    - テキスト: color:#FFFFFF, font-size:17px, font-weight:900
-
-  ■ 全体高さ配分（合計800px）
-    Hero:       96px  (height:96px, fixed)
-    Middle:    622px  (height:622px, fixed)
-      左カラム width:610px（右カラムをやや広げつつ主役を確保）
-        [Layout A] catchphrase: 62px / main image: flex:1 / variation: 165px
-        [Layout B] main image: flex:1 (catchphrase はimage内オーバーレイ) / variation: 165px
-      右カラム width:190px, height:622px通し
-        - 右は「アイコン＋短いワード」だけ（文章説明は置かない）
-        - 3段（flex-col, 3 equal flex:1 cards）。視線を邪魔せず“印象”を補強する役割
-        - **短いワードは創作のニュアンス語にしない**。Amazon 箇条書き・公式スペック・商品名に現れる用語など、**根拠のある事実ベース**に限る（例: ミッドソール名が「Lightstrike Pro」ならそれを短語にする／「反発」系は公式が responsive・energy return 等と言っている場合に限り近い語を選ぶ）。
-    Footer:     82px  (height:82px, fixed)
-
-  ■ ヒーロー（Section 1, ~85px）
-    - ブランド名: font-black, tracking-widest, uppercase, text-white, font-size:18px以上
-    - 商品名: font-black, text-white, さらに大きく
-      目安: 10字以内 → 36px / 11〜18字 → 28px / 19字以上 → 22px
-    - 性別バッジ: 右端に配置（ここにのみ表示。メイン画像にはオーバーレイしない）
-      Men's   → bg-blue-600 text-white
-      Women's → bg-pink-500 text-white
-      Unisex  → bg-gray-500 text-white
-      なし(Activity) → bg-emerald-600 のタグ複数
-      なし(Spec)     → border border-gray-600 text-gray-300 の数値バッジ複数
-    - サブタグ（任意）: PFAS-Free / Washable / GORE-TEX など小さいタグを性別バッジの下に
-
-  ■ メイン画像（Section 2 左カラム上部, flex:1）
-    ┌────── 外ラッパー ─────────────────────────────┐
-    │  background:#FFFFFF, padding:10px 12px 6px 12px  │
-    │  ┌─ 内カード (bg-white + border + rounded-xl) ─┐  │
-    │  │  variation-01.png                               │  │
-    │  │  object-contain, padding:0〜最小                │  │
-    │  └─────────────────────────────────────────────────┘  │
-    └──────────────────────────────────────────────────────┘
-    ※ 背景同化が最重要:
-      - 商品画像が白背景なら、コンテナも **白**にして同化させる（灰色にしない）
-      - 商品画像が薄灰〜灰（Amazon型）で白に馴染まない場合のみ、bg-sp-surface を使い padding を足して自然に見せる
-    フィーチャーカード配色:
-      1枚目（Feature 1） → bg-amber-50, amber テキスト系
-      2枚目（Feature 2） → bg-blue-50, blue テキスト系
-      3枚目（Feature 3） → bg-green-50, green テキスト系
-    アイコン背景:
-      1枚目 → #92400E（amber-900相当）
-      2枚目 → #1D4ED8（blue-600）
-      3枚目 → #059669（green-600）
-
-  ■ 下段ギャラリー（Section 3, 目安 height:148px）— 色展開だけが用途ではない
-    - **バリュエーション総数が 1 かつ、ユーザーが添付した画像が 1 枚だけ**のとき:
-      - **下段ギャラリー（Section 3）ごと省略**する。メイン画像エリア（上段の flex:1）がその分縦に伸びるよう、固定 148px の行を置かない。
-    - **バリュエーション総数が 1 かつ、画像が 2 枚以上**のとき:
-      - 下段は **Amazon のギャラリー行に近い「写真集」**として扱う。`variation-02.png` 以降は **別アングル・ディテール・利用シーン**など、色違い以外のカットを並べてよい。
-      - 各セル下のラベルは **色名に固定しない**（例: Side view / Outsole / On the trail など、写っている内容の短い英語）。
-      - `others-count` は従来どおり **総数 − 添付枚数**（0 以下なら Others なし）。単一 SKU で写真が多いだけなら通常は Others なし。
-    - **バリュエーション総数が 2 以上**のとき:
-      - 下段は **色・モデル等のバリエーション一覧**が主用途。従来の sub + Others の組み合わせでよい。
-      - **同一 PNG をメインと下段の両方に使わない**（`variation-01.png` は **メイン画像専用**。下段ギャラリーは **`variation-02.png` 以降のみ**）。Amazon のように「ヒーロー1枚＋残りをサムネで回す」前提。
-
-    実装メモ（共通）:
-    - flex row でサブ画像セル（最大4）＋（必要なら）Others ボックス。各 `<img src>` は **ページ内で一度だけ**（メインとギャラリーで同じ `variation-XX` を二重参照しない）。
-    - 添付が N 枚のとき: **メインは常に `variation-01.png`**。ギャラリーは **`02`〜`0N` のうちメインに使っていない連番だけ**を左から詰める。色が4種で画像も4枚なら、ギャラリーは最大 **3枠**（02〜04）にし、**01 に写っている色はメイン側のみ**で表現する。
-    - 各セル: 背景は「同化」を優先（白背景なら bg-white）。灰背景で必要な時のみ bg-sp-surface
-    - バリュエーション行コンテナ: background:#FFFFFF, padding:0 12px 10px, gap:6px
-    - Others ボックス: bg-sp-card, width:160px, flex-shrink:0
-      +N は font-size:40px font-black text-sp-dark
-      label は商品タイプに応じて変える（下記）
-      others-count=0 の場合は Others ボックスを表示しない
-    - 画像: object-contain
-    - セル下ラベル: font-size:14px 前後・font-weight:800〜900, text-sp-muted, text-center（スクショで読めることを優先）
-
-    [label] 選択ルール（Others 用）:
-      カラー展開 → "more colors"
-      モデル展開（リール番手・シューズモデル等）→ "more models"
-      バージョン展開 → "more versions"
-      サイズ展開 → "more sizes" / その他 → "more options"
-
-  ■ フッター（Section 4, ~72px）
-    - padding:10px 20px, bg-white, border-t border-sp-border
-    - grid-cols-3 で 3カラム情報表示（| で区切る）:
-        左  : [package-check icon] Genuine Product / Ships from Japan
-        中央: [washing-machine or droplets icon] 商品固有の特徴（例: Machine Washable / Quick-Dry）
-        右  : [leaf or shield icon] エコ・品質情報（例: PFAS-Free / GORE-TEX / Recycled Materials）
-    - 商品に合わせて中央・右の内容を変える（毎回同じにしない）
-
-  ■ head は base.html と同一にすること
+  ■ フッター・ヒーロー・配色・短語の根拠
+    - フィーチャー右列は短文のみ（創作ニュアンス禁止）。
 -->
 <!DOCTYPE html>
 <html lang="en" style="color-scheme:light; background:#FFFFFF;">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=800">
-  <title><!-- 商品名 --> — Main Image</title>
+  <meta name="viewport" content="width=1200">
+  <title><!-- 商品名 --> - Main Image</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet">
@@ -157,10 +44,10 @@
         extend: {
           colors: {
             sp: {
-              bg:       '#FFFFFF', surface:  '#F9FAFB', card: '#F3F4F6',
-              border:   '#E5E7EB', text:     '#111827', muted:    '#6B7280',
-              dim:      '#9CA3AF', dark:     '#1F2937', positive: '#059669',
-              warning:  '#D97706', negative: '#DC2626', blue:     '#1D4ED8',
+              bg: '#FFFFFF', surface: '#F9FAFB', card: '#F3F4F6',
+              border: '#E5E7EB', text: '#111827', muted: '#6B7280',
+              dim: '#9CA3AF', dark: '#1F2937', positive: '#059669',
+              warning: '#D97706', negative: '#DC2626', blue: '#1D4ED8',
               'blue-light': '#EFF6FF', 'blue-mid': '#DBEAFE',
               orange: '#EA580C', 'orange-light': '#FFF7ED',
             }
@@ -170,221 +57,156 @@
       }
     }
   </script>
+  <style>
+    :root {
+      --frame-size: 16px;
+      --frame-color: #555A2B;
+      --section-gap: 8px;
+      --section-gap-half: 4px;
+      --section-gap-onehalf: 12px;
+      --section-gap-double: 16px;
+      --section-radius: 12px;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 1200px;
+      height: 1200px;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+    * { box-sizing: border-box; }
+    .artboard {
+      width: 1200px;
+      height: 1200px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: var(--frame-color);
+      position: relative;
+    }
+    #shopee-main-canvas {
+      position: absolute;
+      inset: var(--frame-size);
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+  </style>
 </head>
-<body class="text-sp-text antialiased" style="width:800px; margin:0; padding:0; background:#FFFFFF !important;">
+<body class="text-sp-text antialiased">
+  <div class="artboard">
+    <div id="shopee-main-canvas">
 
-  <div style="width:800px; height:800px; overflow:hidden; display:flex; flex-direction:column;">
-
-    <!-- ▼ Section 1: Hero (~85px) -->
-    <div class="bg-sp-dark text-white flex-shrink-0" style="padding:14px 28px 12px;">
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <!-- ブランド名（大きく・視認性重視）-->
-          <p class="font-black uppercase text-white leading-none" style="font-size:18px; letter-spacing:0.25em;"><!-- BRAND --></p>
-          <!-- 商品名（文字数に応じてfont-sizeを調整: ~10字→36px, ~18字→28px, 19字超→22px）-->
-          <h1 class="font-black leading-tight tracking-tight text-white mt-0.5" style="font-size:32px; line-height:1.1;"><!-- 商品名 --></h1>
-          <p class="text-gray-200 mt-1" style="font-size:16px; font-weight:800;"><!-- カテゴリ --></p>
-        </div>
-        <!-- 性別バッジ（ヒーロー右端）+ サブタグ -->
-        <div class="flex flex-col items-end gap-2 flex-shrink-0">
-          <!--
-            Men's   → <span ... bg-blue-600 text-white>Men's</span>
-            Women's → <span ... bg-pink-500 text-white>Women's</span>
-            Unisex  → <span ... bg-gray-500 text-white>Unisex</span>
-            なし(Activity) → <span ... bg-emerald-600>Trail Running</span> etc.
-            なし(Spec) → <span ... border border-gray-600 text-gray-300>280g</span> etc.
-          -->
-          <span class="font-bold px-4 py-1.5 rounded-full bg-blue-600 text-white" style="font-size:15px;">Men's</span>
-          <!-- 任意のサブタグ（スペックや特徴）を横並びで追加 -->
-          <div class="flex gap-1.5">
-            <span class="px-3.5 py-1 rounded-full border border-gray-500 text-gray-100" style="font-size:14px; font-weight:800;"><!-- TAG 1 --></span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- ▲ Section 1 END -->
-
-    <!-- ▼ Section 2: メイン画像（左）＋ フィーチャーカード（右） -->
-    <div class="flex-1 flex min-h-0">
-
-      <!--
-        左カラム構成は商品写真の向きで選択:
-        ─────────────────────────────────────────
-        【Layout A: 横長商品】→ キャッチフレーズ帯を上に配置
-        <div style="width:610px; flex-shrink:0; display:flex; flex-direction:column; background:#FFFFFF;">
-          <div style="height:62px; flex-shrink:0; background:#1E3A8A; display:flex; align-items:center; padding:0 20px;">
-            <p style="color:#FFFFFF; font-size:20px; font-weight:900; line-height:1.2;"><!-- キャッチ1行目 --><br>
-              <span style="color:#93C5FD;"><!-- キャッチ2行目 --></span></p>
-          </div>
-          <div style="flex:1; padding:8px 12px 6px 12px; display:flex; min-height:0;">
-            ... メイン画像カード ...
-          </div>
-          ... バリュエーション行 ...
-        </div>
-
-        【Layout B: 縦長商品】→ メイン画像にオーバーレイ
-        <div style="width:610px; flex-shrink:0; display:flex; flex-direction:column; background:#FFFFFF;">
-          <div style="flex:1; padding:10px 12px 6px 12px; display:flex; min-height:0; position:relative;">
-            ... メイン画像カード (position:relative) ...
-            <div style="position:absolute; bottom:14px; left:20px; right:20px; background:rgba(15,23,42,0.82); border-radius:0 0 10px 10px; padding:10px 16px;">
-              <p style="color:#FFFFFF; font-size:17px; font-weight:900; line-height:1.3;"><!-- キャッチフレーズ --></p>
-            </div>
-          </div>
-          ... バリュエーション行 ...
-        </div>
-        ─────────────────────────────────────────
-      -->
-
-      <!-- 左: メイン大画像（ここでは Layout A 横長の例） -->
-      <div style="width:610px; flex-shrink:0; display:flex; flex-direction:column; background:#FFFFFF;">
-
-        <!-- キャッチフレーズ帯 (Layout A) -->
-        <div style="height:62px; flex-shrink:0; background:#1E3A8A; display:flex; align-items:center; padding:0 20px;">
-          <p style="color:#FFFFFF; font-size:20px; font-weight:900; line-height:1.2; letter-spacing:-0.01em;"><!-- キャッチ1行目 --><br>
-            <span style="color:#93C5FD;"><!-- キャッチ2行目 --></span></p>
-        </div>
-
-        <!-- メイン画像カード -->
-        <div style="flex:1; padding:8px 12px 6px 12px; display:flex; min-height:0;">
-          <div class="bg-white border border-sp-border rounded-xl overflow-hidden"
-            style="flex:1; display:flex; align-items:center; justify-content:center;">
-            <img src="./variation-01.png" alt="<!-- メイン画像の alt -->"
-              style="object-fit:contain; width:100%; height:100%; padding:0px;"
-              onerror="this.style.display='none';">
-          </div>
-        </div>
-      </div>
-
-      <!-- 右: 印象アイコン（縦均等分割・文章なし） -->
-      <!-- width:190px, border-l -->
-      <div class="flex flex-col border-l border-sp-border" style="width:190px; flex-shrink:0;">
-
-        <!-- Feature 1（amber系）-->
-        <div class="flex-1 border-b border-sp-border bg-amber-50" style="padding:16px;">
-          <div class="h-full w-full flex flex-col items-center justify-center text-center" style="gap:12px;">
-            <div class="rounded-2xl flex items-center justify-center" style="width:60px; height:60px; background:#92400E;">
-              <i data-lucide="<!-- ICON -->" class="text-white" style="width:30px; height:30px;"></i>
-            </div>
-            <!-- 文章は置かない。短いワード（1〜3語）だけ -->
-            <p class="font-black text-amber-900 leading-tight" style="font-size:17px; letter-spacing:-0.01em;"><!-- FEATURE 1 WORD --></p>
-          </div>
-        </div>
-
-        <!-- Feature 2（blue系）-->
-        <div class="flex-1 border-b border-sp-border bg-blue-50" style="padding:16px;">
-          <div class="h-full w-full flex flex-col items-center justify-center text-center" style="gap:12px;">
-            <div class="rounded-2xl flex items-center justify-center" style="width:60px; height:60px; background:#1D4ED8;">
-              <i data-lucide="<!-- ICON -->" class="text-white" style="width:30px; height:30px;"></i>
-            </div>
-            <p class="font-black text-blue-900 leading-tight" style="font-size:17px; letter-spacing:-0.01em;"><!-- FEATURE 2 WORD --></p>
-          </div>
-        </div>
-
-        <!-- Feature 3（green系）-->
-        <div class="flex-1 bg-green-50" style="padding:16px;">
-          <div class="h-full w-full flex flex-col items-center justify-center text-center" style="gap:12px;">
-            <div class="rounded-2xl flex items-center justify-center" style="width:60px; height:60px; background:#059669;">
-              <i data-lucide="<!-- ICON -->" class="text-white" style="width:30px; height:30px;"></i>
-            </div>
-            <p class="font-black text-green-900 leading-tight" style="font-size:17px; letter-spacing:-0.01em;"><!-- FEATURE 3 WORD --></p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-    <!-- ▲ Section 2 END -->
-
-    <!-- ▼ Section 3: 下段ギャラリー（バリエ or 写真集） -->
-    <!--
-      variation-total==1 かつ 添付画像が1枚のみ → 本 Section は出力しない（メインのみ・800px内で上段を最大化）。
-
-      variation-total==1 かつ 添付が2枚以上 → 下段は「色」ではなく別アングル/利用シーン等の写真集。ラベルも写内容に合わせる。
-
-      variation-total>=2 → 従来: 色・モデル等のサムネ +（必要なら）Others
-        ※ メインで使った variation-01 を下段に再度置かない（02 以降のみ）。
-      例: 添付3枚・others-count>0 → sub2, sub3, sub4 + Others
-          添付3枚・others-count=0 → sub2, sub3, sub4 のみ
-          添付4枚・others-count>0 → sub2, sub3, sub4 + Others（4枚目はOthersに合算）
-      Others ボックス: width:160px, flex-shrink:0
-    -->
-    <div class="flex-shrink-0 border-t border-sp-border" style="height:148px; display:flex;">
-
-      <!-- Sub 1 (背景は同化優先: 白背景なら bg-white。灰背景で必要なら bg-sp-surface + padding を採用) -->
-      <div class="bg-white border border-sp-border rounded-xl overflow-hidden flex-1"
-        style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:5px;">
-        <img src="./variation-02.png"
-          style="object-fit:contain; flex:1; width:100%; min-height:0; padding:0px;"
-          onerror="this.style.display='none';">
-        <p class="text-sp-muted text-center" style="font-size:14px; font-weight:900; flex-shrink:0;"><!-- NAME --></p>
-      </div>
-
-      <!-- Sub 2 -->
-      <div class="bg-white border border-sp-border rounded-xl overflow-hidden flex-1"
-        style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:5px;">
-        <img src="./variation-03.png"
-          style="object-fit:contain; flex:1; width:100%; min-height:0; padding:0px;"
-          onerror="this.style.display='none';">
-        <p class="text-sp-muted text-center" style="font-size:14px; font-weight:900; flex-shrink:0;"><!-- NAME --></p>
-      </div>
-
-      <!-- Sub 3 -->
-      <div class="bg-white border border-sp-border rounded-xl overflow-hidden flex-1"
-        style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:5px;">
-        <img src="./variation-04.png"
-          style="object-fit:contain; flex:1; width:100%; min-height:0; padding:0px;"
-          onerror="this.style.display='none';">
-        <p class="text-sp-muted text-center" style="font-size:14px; font-weight:900; flex-shrink:0;"><!-- NAME --></p>
-      </div>
-
-      <!-- Others（others-count>0 の場合のみ） -->
-      <div class="flex flex-col items-center justify-center bg-sp-card" style="width:160px; flex-shrink:0;">
-        <p class="font-black text-sp-dark leading-none" style="font-size:40px;">+N</p>
-        <p class="text-sp-muted font-semibold mt-0.5" style="font-size:13px;">more [label]</p>
-      </div>
-
-    </div>
-    <!-- ▲ Section 3 END -->
-
-    <!-- ▼ Section 4: フッター（~72px）— 3カラム情報 -->
-    <!--
-      左  : [package-check] Genuine Product / Ships from Japan
-      中央: 商品固有の特徴（例: Machine Washable / Quick-Dry / Waterproof など）
-      右  : エコ・品質情報（例: PFAS-Free / GORE-TEX / Recycled Materials / Made in Japan など）
-      商品に合わせて内容・アイコンを変える
-    -->
-    <div class="border-t border-sp-border flex-shrink-0 bg-white" style="padding:12px 16px;">
-      <div class="grid grid-cols-3 gap-3">
-
-        <div class="flex items-start gap-2.5">
-          <i data-lucide="package-check" class="text-sp-positive flex-shrink-0 mt-0.5" style="width:22px; height:22px;"></i>
+      <div class="bg-sp-dark text-white" style="position:absolute; top:var(--section-gap); left:var(--section-gap); width:calc(100% - var(--section-gap-double)); height:calc(12% - var(--section-gap)); padding:0 3.5%; display:flex; align-items:center; overflow:hidden; border-radius:var(--section-radius);">
+        <div class="flex items-center justify-between gap-6 w-full min-w-0">
           <div>
-            <p class="font-extrabold text-sp-text leading-snug" style="font-size:15px;">Genuine Product</p>
-            <p class="text-sp-muted leading-snug mt-0.5" style="font-size:14px;">Ships from Japan</p>
+            <p class="font-black uppercase text-white leading-none" style="font-size:27px; letter-spacing:0.25em;"><!-- BRAND --></p>
+            <h1 class="font-black leading-tight tracking-tight text-white mt-1" style="font-size:48px; line-height:1.1;"><!-- 商品名 --></h1>
+            <p class="text-gray-200 mt-1.5" style="font-size:24px; font-weight:800;"><!-- カテゴリ --></p>
+          </div>
+          <div class="flex flex-col items-end gap-3 flex-shrink-0">
+            <span class="font-bold px-6 py-2.5 rounded-full bg-blue-600 text-white" style="font-size:22px;">Men's</span>
+            <div class="flex gap-2">
+              <span class="px-5 py-1.5 rounded-full border border-gray-500 text-gray-100" style="font-size:20px; font-weight:800;"><!-- TAG 1 --></span>
+            </div>
           </div>
         </div>
-
-        <div class="flex items-start gap-2.5 border-l border-sp-border pl-3">
-          <i data-lucide="<!-- ICON -->" class="text-sp-blue flex-shrink-0 mt-0.5" style="width:22px; height:22px;"></i>
-          <div>
-            <p class="font-extrabold text-sp-text leading-snug" style="font-size:15px;"><!-- 中央タイトル --></p>
-            <p class="text-sp-muted leading-snug mt-0.5" style="font-size:14px;"><!-- 中央サブテキスト --></p>
-          </div>
-        </div>
-
-        <div class="flex items-start gap-2.5 border-l border-sp-border pl-3">
-          <i data-lucide="<!-- ICON -->" class="text-sp-positive flex-shrink-0 mt-0.5" style="width:22px; height:22px;"></i>
-          <div>
-            <p class="font-extrabold text-sp-text leading-snug" style="font-size:15px;"><!-- 右タイトル --></p>
-            <p class="text-sp-muted leading-snug mt-0.5" style="font-size:14px;"><!-- 右サブテキスト --></p>
-          </div>
-        </div>
-
       </div>
-    </div>
-    <!-- ▲ Section 4 END -->
 
+      <div style="position:absolute; top:calc(12% + var(--section-gap)); left:var(--section-gap); width:calc(76.25% - var(--section-gap-onehalf)); height:calc(7.75% - var(--section-gap)); background:#1E3A8A; display:flex; align-items:center; padding:0 2.5%; border-radius:var(--section-radius); overflow:hidden;">
+        <p style="color:#FFFFFF; font-size:30px; font-weight:900; line-height:1.2; letter-spacing:-0.01em;"><!-- キャッチ1行目 --><br>
+          <span style="color:#93C5FD;"><!-- キャッチ2行目 --></span></p>
+      </div>
+
+      <div style="position:absolute; top:calc(19.75% + var(--section-gap)); left:var(--section-gap); width:calc(76.25% - var(--section-gap-onehalf)); height:calc(51.5% - var(--section-gap-onehalf)); padding:1% 1.5% 0.75% 1.5%; display:flex; border-radius:var(--section-radius);">
+        <div class="bg-white border border-sp-border rounded-xl overflow-hidden" style="flex:1; display:flex; align-items:center; justify-content:center;">
+          <img src="./variation-01.png" alt="<!-- メイン画像の alt -->"
+            style="object-fit:contain; width:100%; height:100%; padding:0;"
+            onerror="this.style.display='none';">
+        </div>
+      </div>
+
+      <div style="position:absolute; top:calc(12% + var(--section-gap)); left:calc(76.25% + var(--section-gap-half)); width:calc(23.75% - var(--section-gap-onehalf)); height:calc(59.25% - var(--section-gap-onehalf)); display:grid; grid-template-rows:1fr 1fr 1fr; gap:var(--section-gap);">
+        <div class="border border-sp-border bg-amber-50" style="padding:2%; border-radius:var(--section-radius); overflow:hidden;">
+          <div class="h-full w-full flex flex-col items-center justify-center text-center" style="gap:18px;">
+            <div class="rounded-2xl flex items-center justify-center" style="width:90px; height:90px; background:#92400E;">
+              <i data-lucide="<!-- ICON -->" class="text-white" style="width:45px; height:45px;"></i>
+            </div>
+            <p class="font-black text-amber-900 leading-tight" style="font-size:26px; letter-spacing:-0.01em;"><!-- FEATURE 1 WORD --></p>
+          </div>
+        </div>
+        <div class="border border-sp-border bg-blue-50" style="padding:2%; border-radius:var(--section-radius); overflow:hidden;">
+          <div class="h-full w-full flex flex-col items-center justify-center text-center" style="gap:18px;">
+            <div class="rounded-2xl flex items-center justify-center" style="width:90px; height:90px; background:#1D4ED8;">
+              <i data-lucide="<!-- ICON -->" class="text-white" style="width:45px; height:45px;"></i>
+            </div>
+            <p class="font-black text-blue-900 leading-tight" style="font-size:26px; letter-spacing:-0.01em;"><!-- FEATURE 2 WORD --></p>
+          </div>
+        </div>
+        <div class="border border-sp-border bg-green-50" style="padding:2%; border-radius:var(--section-radius); overflow:hidden;">
+          <div class="h-full w-full flex flex-col items-center justify-center text-center" style="gap:18px;">
+            <div class="rounded-2xl flex items-center justify-center" style="width:90px; height:90px; background:#059669;">
+              <i data-lucide="<!-- ICON -->" class="text-white" style="width:45px; height:45px;"></i>
+            </div>
+            <p class="font-black text-green-900 leading-tight" style="font-size:26px; letter-spacing:-0.01em;"><!-- FEATURE 3 WORD --></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- variation-total==1 かつ画像1枚のみのときは本ブロックごと出力しない。その場合も white gutter を保ちつつ、メイン画像は top:calc(19.75% + var(--section-gap)) / height:calc(70% - var(--section-gap-onehalf))、右列は top:calc(12% + var(--section-gap)) / height:calc(77.75% - var(--section-gap-onehalf)) に変更 -->
+      <div style="position:absolute; top:calc(71.25% + var(--section-gap-half)); left:var(--section-gap); width:calc(100% - var(--section-gap-double)); height:calc(18.5% - var(--section-gap)); background:#FFFFFF; padding:0 0 1.25%; display:flex; gap:0.75%; border-radius:var(--section-radius);">
+        <div class="bg-white border border-sp-border rounded-xl overflow-hidden flex-1 min-w-0" style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:0.65%;">
+          <img src="./variation-02.png"
+            style="object-fit:contain; flex:1; width:100%; min-height:0; padding:0;"
+            onerror="this.style.display='none';">
+          <p class="text-sp-muted text-center" style="font-size:21px; font-weight:900; flex-shrink:0;"><!-- NAME --></p>
+        </div>
+        <div class="bg-white border border-sp-border rounded-xl overflow-hidden flex-1 min-w-0" style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:0.65%;">
+          <img src="./variation-03.png"
+            style="object-fit:contain; flex:1; width:100%; min-height:0; padding:0;"
+            onerror="this.style.display='none';">
+          <p class="text-sp-muted text-center" style="font-size:21px; font-weight:900; flex-shrink:0;"><!-- NAME --></p>
+        </div>
+        <div class="bg-white border border-sp-border rounded-xl overflow-hidden flex-1 min-w-0" style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:0.65%;">
+          <img src="./variation-04.png"
+            style="object-fit:contain; flex:1; width:100%; min-height:0; padding:0;"
+            onerror="this.style.display='none';">
+          <p class="text-sp-muted text-center" style="font-size:21px; font-weight:900; flex-shrink:0;"><!-- NAME --></p>
+        </div>
+        <div class="flex flex-col items-center justify-center bg-sp-card border border-sp-border rounded-xl" style="width:20%; flex-shrink:0;">
+          <p class="font-black text-sp-dark leading-none" style="font-size:60px;">+N</p>
+          <p class="text-sp-muted font-semibold mt-1" style="font-size:20px;">more [label]</p>
+        </div>
+      </div>
+
+      <div class="border border-sp-border bg-white" style="position:absolute; top:calc(89.75% + var(--section-gap-half)); left:var(--section-gap); width:calc(100% - var(--section-gap-double)); height:calc(10.25% - var(--section-gap-onehalf)); padding:0 2%; display:flex; align-items:center; overflow:hidden; border-radius:var(--section-radius);">
+        <div class="grid grid-cols-3 gap-5 w-full">
+          <div class="flex items-start gap-4">
+            <i data-lucide="package-check" class="text-sp-positive flex-shrink-0 mt-1" style="width:33px; height:33px;"></i>
+            <div>
+              <p class="font-extrabold text-sp-text leading-snug" style="font-size:23px;">Genuine Product</p>
+              <p class="text-sp-muted leading-snug mt-1" style="font-size:20px;">Ships from Japan</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 border-l border-sp-border pl-5">
+            <i data-lucide="<!-- ICON -->" class="text-sp-blue flex-shrink-0 mt-1" style="width:33px; height:33px;"></i>
+            <div>
+              <p class="font-extrabold text-sp-text leading-snug" style="font-size:23px;"><!-- 中央タイトル --></p>
+              <p class="text-sp-muted leading-snug mt-1" style="font-size:20px;"><!-- 中央サブテキスト --></p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 border-l border-sp-border pl-5">
+            <i data-lucide="<!-- ICON -->" class="text-sp-positive flex-shrink-0 mt-1" style="width:33px; height:33px;"></i>
+            <div>
+              <p class="font-extrabold text-sp-text leading-snug" style="font-size:23px;"><!-- 右タイトル --></p>
+              <p class="text-sp-muted leading-snug mt-1" style="font-size:20px;"><!-- 右サブテキスト --></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
-
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>lucide.createIcons();</script>
 </body>

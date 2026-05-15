@@ -18,11 +18,13 @@ Shopee 図解フローが生成する説明カード HTML は幅 800px 固定の
 1. HTMLファイルをChromeで開く
 2. `Ctrl+0` でズームを100%に設定する
 3. `F12` でDevToolsを開く
-4. `Ctrl+Shift+P` でコマンドパレットを開く
-5. `screenshot` と入力 → **「Capture full size screenshot」** を選択
-6. 保存されたPNGがDownloadsフォルダに入る
+4. Elements パネルで、`<body>` 直下の **`<div class="artboard">`** を選択する
+5. `Ctrl+Shift+P` でコマンドパレットを開く
+6. `node screenshot` と入力 → **「Capture node screenshot」** を選択
+7. 保存されたPNGがDownloadsフォルダに入る
 
-> 「Capture full size screenshot」はページ全体（スクロール不要）を1枚のPNGとして保存する。
+> `Capture node screenshot` は選択した要素だけを切り出して保存する。  
+> Shopee 図解では `.artboard` が固定サイズのルート要素なので、`main-image` は **1200×1200 の1:1**、`product-card` は **800px幅のカード本体**だけを余白なしで保存できる。
 
 ## ファイルサイズが2MBを超える場合
 

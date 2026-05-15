@@ -1,7 +1,7 @@
 ---
 name: shopee-explainer-common
 description: >-
-  Canonical rules for Shopee explainer HTML (800px description card + 800×800 main image): shared templates,
+  Canonical rules for Shopee explainer HTML (800px description card + 1200×1200 main image): shared templates,
   prohibitions, pointers to SSOT references (quality gate, screenshot workflow). Read together with a category skill (e.g. outdoor).
   Do not use for generic diagram requests ("図解して" without Shopee explainer context).
 disable-model-invocation: true
@@ -14,12 +14,13 @@ disable-model-invocation: true
 
 ## 成果物（すべてのカテゴリ共通）
 
-Shopee の Description 用 **説明カード**（幅 800px）と、商品ページ用 **メイン画像**（800×800px・1:1）の **2 枚**を HTML として出す。
+Shopee 関連の図解依頼では、**ユーザーに最終的に渡す成果物は 3 点**とする。
 
 | 出力 | ファイル名 | 仕様 |
 |------|------------|------|
-| 説明カード | `product-card-{product-slug}.html` | 幅 800px（`body` / ラッパーで固定） |
-| メイン画像 | `main-image-{product-slug}.html` | `width:800px;height:800px;` で固定 |
+| 説明カード | `product-card-{product-slug}.html` | 幅 800px（`references/base.html` の額縁に従う） |
+| メイン画像 | `main-image-{product-slug}.html` | `1200×1200` 固定。`body` 直下に `.artboard` を置き、外枠フレーム込みで構成する |
+| プロダクト名 | なし（完了報告で出力） | **100文字以内**・SEO/AEO レビュー済みの **英語 1 行**を、**コードブロック**で必ず出す |
 
 保存先（リポジトリルート相対）: `output/shopee/{product-slug}/`  
 バリエーション画像: `variation-01.png` …（HTML からは `./variation-01.png`）
@@ -28,7 +29,7 @@ Shopee の Description 用 **説明カード**（幅 800px）と、商品ペー�
 
 - **英語のみ**（タイトル・本文・ラベル）
 - **価格・配送・返品を書かない**
-- **800px（カード）・800×800（メイン）を崩さない**
+- **800px（カード）・1200×1200（メイン）を崩さない**
 - **JavaScript を追加しない**（`lucide.createIcons()` 等、テンプレ既存のものは可）
 - **外部画像 CDN はテンプレの範囲内**（Google Fonts・Tailwind CDN・unpkg Lucide のみ想定）
 - **絵文字禁止** — アイコンは Lucide
@@ -39,11 +40,13 @@ Shopee の Description 用 **説明カード**（幅 800px）と、商品ペー�
 
 1. `references/shopee-specs.md` — 画像制限・**Chrome スクショ手順**・2MB・tinypng
 2. `references/shopee-generation-ssot.md` — **正本マップ**・品質ゲート・完了報告テンプレ・画像カード背景ルール
-3. `references/base.html` — 説明カード用 `<head>` / Tailwind 配色（800px）
-4. `references/main-image.html` — メイン 800×800 の **構造・Layout A/B・キャッチ帯・フッター・Others**（コメント＋マークアップが SSOT）
+3. `references/base.html` — 説明カード用 `<head>` / Tailwind 配色（800px 幅カード）
+4. `references/main-image.html` — メイン 1200×1200 の **固定レイアウト**（`.artboard`・`#shopee-main-canvas`・固定座標・Others）が SSOT
 5. `references/size-charts/README.md` — サイズ倉庫・命名・**優先順位・Unisex・免除・HTML 表化**（サイズに関する本文の SSOT）
+6. `references/shopee-product-listing-title.md` — **Shopee 出品名**の 100 字ルール・コードブロック出力・図解フロー内レビュー手順
 
-生成直前のチェックリストと完了報告の文言は **`shopee-generation-ssot.md` に合わせる**（本 SKILL に繰り返し書かない）。
+生成直前のチェックリストと完了報告の文言は **`shopee-generation-ssot.md` に合わせる**（本 SKILL に繰り返し書かない）。  
+SEO/AEO レビューは **`.claude/skills/shopee-product-name-seo-aeo-review/SKILL.md`** と **`.claude/skills/shopee-product-name-seo-aeo-review/references/seo-aeo-rubric.md`** に従う。
 
 ## メイン画像・サイズ（要約のみ）
 
@@ -60,4 +63,5 @@ Shopee の Description 用 **説明カード**（幅 800px）と、商品ペー�
 ## カテゴリスキル側の責務
 
 - **トリガー語**・**収集する商品ジャンル**・**パターン A/B/C の選択**・ジャンル固有のコピートーン
+- **Shopee プロダクト名**の下書き → SEO/AEO レビュー → 最終行確定のワークフローを、完了報告前に必ず実行すること
 - 生成前に **本ファイルと上記 `references/` 正本**を読んだうえでワークフローを進める
